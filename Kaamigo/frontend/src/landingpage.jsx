@@ -88,6 +88,7 @@ const Navbar = () => {
 // Landing Page
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
@@ -105,8 +106,11 @@ const LandingPage = () => {
             type="text"
             placeholder="Search for gigs or workers..."
             className="w-full px-6 py-4 border-2 border-purple-200 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none focus:outline-none focus:border-purple-500 transition-colors duration-300 text-lg"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/explore?q=${encodeURIComponent(search)}`); }}
           />
-          <button className="bg-purple-600 text-white px-8 py-4 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <button onClick={() => navigate(`/explore?q=${encodeURIComponent(search)}`)} className="bg-purple-600 text-white px-8 py-4 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
             Search
           </button>
         </div>
@@ -116,7 +120,7 @@ const LandingPage = () => {
           <button onClick={() => navigate('/coming-soon')} className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
             📥 Download the App
           </button>
-          <button className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+          <button onClick={() => navigate('/sign')} className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
             Join as a Freelancer / Client
           </button>
         </div>

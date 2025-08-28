@@ -27,7 +27,7 @@ export default function Signup() {
     try {
       const authProvider = new GoogleAuthProvider();
       await signInWithPopup(auth, authProvider);
-      navigate("/dashboard");
+      navigate("/explore");
     } catch (err) {
       console.error("Social login error:", err);
       setError("Social login failed. Please try again.");
@@ -55,7 +55,7 @@ export default function Signup() {
 
     try {
       await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      navigate("/dashboard");
+      navigate("/explore");
     } catch (err) {
       console.error("Signup error:", err);
       switch (err.code) {
