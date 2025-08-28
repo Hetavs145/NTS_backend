@@ -90,11 +90,8 @@ const AboutPage = () => {
           <button className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-all">
             Subscribe
           </button>
-          <div className="flex gap-4 mt-4">
-            <a href="#"><FaInstagram className="text-pink-500 text-xl" /></a>
-            <a href="#"><FaLinkedin className="text-blue-700 text-xl" /></a>
-            <a href="#"><FaTwitter className="text-blue-500 text-xl" /></a>
-            <a href="mailto:info@kaamigo.com"><FaEnvelope className="text-gray-600 text-xl" /></a>
+          <div className="text-center text-gray-600 text-sm">
+            <p>Get in touch with us at <a href="mailto:info@kaamigo.com" className="text-purple-600 hover:underline">info@kaamigo.com</a></p>
           </div>
         </div>
       </section>

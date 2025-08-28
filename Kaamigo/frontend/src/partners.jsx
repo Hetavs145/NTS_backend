@@ -25,7 +25,31 @@ const Partners = () => (
     <div className="bg-gradient-to-r from-purple-200 to-orange-200 p-6 sm:p-10 text-center rounded-b-3xl shadow mb-10 animate-fade-in">
       <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-gray-800">Partner with Kaamigo: Empower Communities, Drive Growth</h1>
       <p className="max-w-2xl mx-auto mb-6 text-sm sm:text-lg text-gray-700">Join our mission to connect talent with opportunity. Collaborate with us to unlock new markets, empower local communities, and drive business growth.</p>
-      <button className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl font-bold shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300">Become a Partner</button>
+      <button 
+        onClick={() => {
+          // Open email client with partnership inquiry
+          const subject = encodeURIComponent('Partnership Inquiry - Kaamigo');
+          const body = encodeURIComponent(`Hi Kaamigo Team,
+
+I'm interested in becoming a partner with Kaamigo. Here are some details about my organization:
+
+Organization Name:
+Industry:
+Partnership Type (Co-branding, Skill Development, Innovation Labs, etc.):
+Expected Impact:
+Contact Information:
+
+Looking forward to discussing potential collaboration opportunities.
+
+Best regards,
+[Your Name]`);
+          
+          window.location.href = `mailto:partnerships@kaamigo.com?subject=${subject}&body=${body}`;
+        }}
+        className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl font-bold shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
+      >
+        Become a Partner
+      </button>
     </div>
 
     {/* Why Partner With Us */}
