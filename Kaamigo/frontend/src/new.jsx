@@ -85,6 +85,7 @@ const Navbar = () => {
 
 // Landing Page
 const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white text-gray-800">
       {/* Hero Section */}

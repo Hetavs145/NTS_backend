@@ -173,7 +173,7 @@ export default function Explore() {
               </div>
             ))}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</n+div>
+              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</div>
             )}
           </div>
         </section>
