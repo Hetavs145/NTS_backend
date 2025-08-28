@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { auth, db } from "../firebase";
-import { supabase } from "../supabase";
 import { collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ReelUpload = ({ onUploadSuccess }) => {
   const formRef = useRef(null);
@@ -28,40 +28,23 @@ const ReelUpload = ({ onUploadSuccess }) => {
       return;
     }
 
-    const thumbPath = `thumbnails/${crypto.randomUUID()}`;
-    const videoPath = `videos/${crypto.randomUUID()}`;
+    const thumbPath = `reels/thumbnails/${crypto.randomUUID()}`;
+    const videoPath = `reels/videos/${crypto.randomUUID()}`;
 
     setUploadProgress(10);
-    const { data: thumbData, error: thumbErr } = await supabase.storage
-      .from("reels")
-      .upload(thumbPath, thumbnail, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+    const storage = getStorage();
+    const thumbRef = ref(storage, thumbPath);
+    await uploadBytes(thumbRef, thumbnail);
 
     setUploadProgress(30);
 
-    const { data: videoData, error: videoErr } = await supabase.storage
-      .from("reels")
-      .upload(videoPath, video, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+    const videoRef = ref(storage, videoPath);
+    await uploadBytes(videoRef, video);
 
     setUploadProgress(60);
 
-    if (thumbErr || videoErr) {
-      console.error("Thumbnail upload error:", thumbErr);
-      console.error("Video upload error:", videoErr);
-      alert("Upload failed. See console.");
-      setIsLoading(false);
-      return;
-    }
-
-    const thumbUrl = supabase.storage.from("reels").getPublicUrl(thumbPath)
-      .data.publicUrl;
-    const videoUrl = supabase.storage.from("reels").getPublicUrl(videoPath)
-      .data.publicUrl;
+    const thumbUrl = await getDownloadURL(thumbRef);
+    const videoUrl = await getDownloadURL(videoRef);
 
     setUploadProgress(80);
 
