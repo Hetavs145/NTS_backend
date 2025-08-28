@@ -5,6 +5,16 @@ import { FaInstagram, FaTwitter, FaLinkedin, FaFacebook } from 'react-icons/fa';
 export default function Footer() {
   return (
     <footer className="bg-[#181B23] py-10 text-center text-gray-300 mt-16 px-4 relative">
+      {/* Back-to-top icon near top-right */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="absolute -top-4 right-4 bg-orange-600 hover:bg-orange-500 text-white w-10 h-10 rounded-full shadow flex items-center justify-center"
+        aria-label="Scroll to top"
+        title="Back to top"
+      >
+        ^
+      </button>
+
       <div className="mb-4 flex flex-wrap justify-center gap-3 text-sm">
         <span className="font-semibold text-purple-300">Our Pages:</span>
         <Link to="/" className="hover:text-orange-400 transition">Home</Link>
@@ -24,13 +34,6 @@ export default function Footer() {
       <div className="text-3xl font-bold text-purple-400 mb-2">Kaamigo</div>
       <div className="mb-2 text-sm">Connecting talent with opportunities through voice-first innovation</div>
       <div className="text-xs text-gray-500">© {new Date().getFullYear()} Kaamigo. All rights reserved.</div>
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="mt-6 inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-full shadow"
-        aria-label="Scroll to top"
-      >
-        ↑ Back to top
-      </button>
     </footer>
   );
 }

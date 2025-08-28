@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
 import MapWithRadius from "./mapWithRedius";
@@ -7,6 +7,8 @@ import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 export default function Explore() {
+  const locationHook = useLocation();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
@@ -15,6 +17,13 @@ export default function Explore() {
   const [price, setPrice] = useState(500);
 
   const [remoteFreelancers, setRemoteFreelancers] = useState([]);
+
+  // Initialize from query param
+  useEffect(() => {
+    const params = new URLSearchParams(locationHook.search);
+    const qParam = params.get("q") || "";
+    if (qParam) setQuery(qParam);
+  }, [locationHook.search]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -196,7 +205,7 @@ export default function Explore() {
                 <MapWithRadius />
               </div>
               <div className="text-center mt-4">
-                <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                <button onClick={() => navigate('/explore')} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
                   View All Freelancers
                 </button>
               </div>
@@ -214,9 +223,9 @@ export default function Explore() {
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
                 <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <a href="#" className="text-xs text-purple-600 hover:underline">
+                <button onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} className="text-xs text-purple-600 hover:underline">
                   View Profile
-                </a>
+                </button>
               </div>
             ))}
             {filtered.length === 0 && (
