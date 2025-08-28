@@ -162,7 +162,7 @@ export default function LoginPage() {
                 disabled={loading}
               />
               By signing in, I agree with the{" "}
-              <a href="/coming-soon" className="text-orange-500 ml-1 underline">
+              <a href="#" className="text-orange-500 ml-1 underline">
                 Terms of Use & Privacy Policy
               </a>
             </div>
