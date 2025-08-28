@@ -19,7 +19,6 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +48,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`relative flex flex-wrap items-center justify-between px-6 md:px-8 py-4 md:py-6 border-b shadow-sm transition-all duration-300 ${
+    <nav className={`flex flex-wrap items-center justify-between px-6 md:px-8 py-4 md:py-6 border-b shadow-sm transition-all duration-300 ${
       darkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-indigo-50 text-gray-800 border-gray-200'
     }`}>
       {/* Logo */}
@@ -58,20 +57,6 @@ const Navbar = () => {
       }`}>
         Kaamigo
       </NavLink>
-
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="md:hidden p-2 rounded-lg transition-colors duration-300"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {mobileMenuOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
 
       {/* Navigation links */}
       <div className="hidden md:flex flex-wrap space-x-2 text-base font-medium">
@@ -83,21 +68,6 @@ const Navbar = () => {
         <NavLink to="/contact" className={navLinkClass}>Contact Us</NavLink>
         <NavLink to="/blog" className={navLinkClass}>Blog</NavLink>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
-          <div className="px-6 py-4 space-y-3">
-            <NavLink to="/" className={navLinkClass} end onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
-            <NavLink to="/explore" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Explore</NavLink>
-            <NavLink to="/about" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>About Us</NavLink>
-            <NavLink to="/partners" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Partners</NavLink>
-            <NavLink to="/coins" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Coins</NavLink>
-            <NavLink to="/contact" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Contact Us</NavLink>
-            <NavLink to="/blog" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Blog</NavLink>
-          </div>
-        </div>
-      )}
 
       {/* Auth Buttons and Dark Mode Toggle */}
       <div className="flex items-center space-x-4 mt-4 md:mt-0">

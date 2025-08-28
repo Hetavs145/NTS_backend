@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import PostGigModal from "./postgig";
-import PostJobModal from "./components/PostJobModal";
 import ApplyGigModal from "./ApplyGigModal";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
@@ -21,7 +20,6 @@ const SpeechRecognition =
 
 export default function Jobs() {
   const [showModal, setShowModal] = useState(false);
-  const [showPostJobModal, setShowPostJobModal] = useState(false);
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
 
@@ -218,17 +216,6 @@ export default function Jobs() {
           </div>
         </div>
 
-        {/* Post Job Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setShowPostJobModal(true)}
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 shadow-lg"
-          >
-            <FaBriefcase />
-            Post Job
-          </button>
-        </div>
-
         {/* Job Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGigs.map((gig) => (
@@ -248,23 +235,15 @@ export default function Jobs() {
                 <p className="text-sm text-gray-700 mt-2">{gig.description}</p>
               </div>
               <div className="flex justify-between items-center pt-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-orange-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {gig.clientName?.charAt(0) || 'C'}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{gig.clientName || 'Client'}</p>
-                    <p className="text-xs text-gray-500">{gig.postedAt || "New"}</p>
-                  </div>
-                </div>
+                <p className="text-sm text-gray-400">{gig.postedAt || "New"}</p>
                 <button
-                  className="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600 transition-colors"
+                  className="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
                   onClick={() => {
-                    // TODO: Open chat portal
-                    alert('Chat functionality coming soon!');
+                    setSelectedJobTitle(gig.title);
+                    setApplyModalOpen(true);
                   }}
                 >
-                  Send Message
+                  Apply Now
                 </button>
               </div>
             </div>
@@ -292,7 +271,13 @@ export default function Jobs() {
           </div>
         </div>
 
-        
+        {/* Scroll Button */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-4 right-4 bg-orange-600 text-white px-3 py-2 rounded-full shadow hover:bg-gradient-to-r from-orange-400 to-yellow-500 transition duration-300"
+        >
+          Go Back
+        </button>
 
         {/* Modals */}
         <PostGigModal
@@ -304,14 +289,6 @@ export default function Jobs() {
           open={applyModalOpen}
           onClose={() => setApplyModalOpen(false)}
           jobTitle={selectedJobTitle}
-        />
-        <PostJobModal
-          isOpen={showPostJobModal}
-          onClose={() => setShowPostJobModal(false)}
-          onJobPosted={(newJob) => {
-            setGigs(prev => [newJob, ...prev]);
-            setShowPostJobModal(false);
-          }}
         />
       </main>
     </div>

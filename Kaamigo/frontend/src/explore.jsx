@@ -270,20 +270,7 @@ export default function Explore() {
               />
               <div>
                 <label className="block text-sm font-medium mb-1">Rating</label>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      onClick={() => setRating(star)}
-                      className={`text-2xl transition-colors ${
-                        rating >= star ? 'text-yellow-400' : 'text-gray-300'
-                      } hover:text-yellow-400`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-600 mt-1">{rating}+ Rating</div>
+                <input value={rating} onChange={(e) => setRating(Number(e.target.value))} type="range" min="1" max="5" className="w-full accent-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Price Range (₹)</label>
