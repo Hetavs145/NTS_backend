@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import PostGigModal from "./postgig";
+import PostJobModal from "./PostJobModal";
 import ApplyGigModal from "./ApplyGigModal";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
@@ -20,6 +21,7 @@ const SpeechRecognition =
 
 export default function Jobs() {
   const [showModal, setShowModal] = useState(false);
+  const [showPostJobModal, setShowPostJobModal] = useState(false);
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
 
@@ -54,6 +56,11 @@ export default function Jobs() {
     setGigs((prev) => [{ id: Date.now(), ...newGig }, ...prev]);
   };
 
+  const handleJobPosted = () => {
+    // Refresh jobs list
+    window.location.reload();
+  };
+
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [budgetFilter, setBudgetFilter] = useState("");
@@ -72,18 +79,48 @@ export default function Jobs() {
   const hasMic = Boolean(SpeechRecognition);
 
   const startVoiceSearch = () => {
-    if (!hasMic) return;
-    const recog = new SpeechRecognition();
-    recog.lang = "en-US";
-    recog.interimResults = false;
-    recog.onstart = () => setListening(true);
-    recog.onerror = () => setListening(false);
-    recog.onend = () => setListening(false);
-    recog.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setQuery(transcript);
-    };
-    recog.start();
+    if (!hasMic) {
+      alert("Voice recognition is not supported in your browser. Please use Chrome or Edge.");
+      return;
+    }
+    
+    try {
+      const recog = new SpeechRecognition();
+      recog.lang = "en-US";
+      recog.interimResults = false;
+      recog.continuous = false;
+      
+      recog.onstart = () => {
+        setListening(true);
+        console.log("Voice recognition started");
+      };
+      
+      recog.onerror = (event) => {
+        console.error("Voice recognition error:", event.error);
+        setListening(false);
+        if (event.error === 'not-allowed') {
+          alert("Please allow microphone access for voice search");
+        }
+      };
+      
+      recog.onend = () => {
+        setListening(false);
+        console.log("Voice recognition ended");
+      };
+      
+      recog.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        console.log("Voice transcript:", transcript);
+        setQuery(transcript);
+        setListening(false);
+      };
+      
+      recog.start();
+    } catch (error) {
+      console.error("Error starting voice recognition:", error);
+      alert("Failed to start voice recognition. Please try again.");
+      setListening(false);
+    }
   };
 
   const filteredGigs = useMemo(() => {
@@ -141,15 +178,21 @@ export default function Jobs() {
         {/* Header */}
         <div className="flex flex-wrap lg:justify-between gap-2 mb-8">
           <h2 className="text-3xl font-bold text-orange-500">Jobs Board</h2>
-          <div className="flex gap-2">
+                    <div className="flex gap-2">
             <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500">
               Browse Jobs
+            </button>
+            <button
+              onClick={() => setShowPostJobModal(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Post a Job
             </button>
             <button
               onClick={() => setShowModal(true)}
               className="bg-white text-orange-600 px-4 py-2 border border-orange-500 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500 hover:text-white"
             >
-              Post a Gig
+              Post a Gig
             </button>
           </div>
         </div>
@@ -168,11 +211,14 @@ export default function Jobs() {
               <button
                 type="button"
                 onClick={startVoiceSearch}
-                className={`absolute right-6 top-1/2 -translate-y-1/2 text-purple-600 ${
-                  listening ? "animate-pulse" : ""
+                className={`absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 ${
+                  listening 
+                    ? "bg-red-500 text-white animate-pulse shadow-lg" 
+                    : "text-purple-600 hover:text-purple-800 hover:bg-purple-100"
                 }`}
+                title={listening ? "Listening..." : "Click to use voice search"}
               >
-                <FaMicrophone size={25} />
+                <FaMicrophone size={20} />
               </button>
             )}
           </div>
@@ -271,19 +317,18 @@ export default function Jobs() {
           </div>
         </div>
 
-        {/* Scroll Button */}
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-4 right-4 bg-orange-600 text-white px-3 py-2 rounded-full shadow hover:bg-gradient-to-r from-orange-400 to-yellow-500 transition duration-300"
-        >
-          Go Back
-        </button>
+        
 
         {/* Modals */}
         <PostGigModal
           open={showModal}
           onClose={() => setShowModal(false)}
           onGigPosted={handleAddGig}
+        />
+        <PostJobModal 
+          isOpen={showPostJobModal} 
+          onClose={() => setShowPostJobModal(false)} 
+          onJobPosted={handleJobPosted} 
         />
         <ApplyGigModal
           open={applyModalOpen}

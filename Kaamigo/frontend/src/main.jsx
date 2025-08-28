@@ -42,6 +42,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/explore" element={<Explore/>} />
         <Route path="/explore/reels" element={<Reels/>} />
         <Route path="/explore/jobs" element={<Jobs/>} />
+        <Route path="/explore/post-job" element={<PostJobModal isOpen={true} onClose={() => navigate('/explore/jobs')} />} />
         <Route path="/explore/profile" element={<Profile/>} />
         <Route path="/explore/features" element={<Features/>} />
         <Route path="/explore/how-it-works" element={<HowItWorks/>} />

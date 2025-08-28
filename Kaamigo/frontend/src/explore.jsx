@@ -270,7 +270,20 @@ export default function Explore() {
               />
               <div>
                 <label className="block text-sm font-medium mb-1">Rating</label>
-                <input value={rating} onChange={(e) => setRating(Number(e.target.value))} type="range" min="1" max="5" className="w-full accent-orange-500" />
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className={`text-2xl transition-colors duration-200 ${
+                        star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                      } hover:text-yellow-400`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">{rating}+ rating</div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Price Range (₹)</label>
@@ -307,13 +320,13 @@ export default function Explore() {
 
           {/* Map Section */}
           <section className="lg:col-span-2 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 text-center mb-4">Freelancers Around You (10km)</h2>
-              <div className="h-[400px] rounded-lg overflow-hidden">
+            <div className="bg-gradient-to-br from-purple-50 to-orange-50 border-2 border-purple-200 p-6 rounded-xl shadow-lg">
+              <h2 className="text-xl font-bold text-purple-800 text-center mb-4">Freelancers Around You (10km)</h2>
+              <div className="h-[400px] rounded-lg overflow-hidden border-2 border-purple-300">
                 <MapWithRadius freelancers={nearbyFreelancers} userLocation={userLocation} />
               </div>
               <div className="text-center mt-4">
-                <button onClick={() => navigate('/explore')} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                <button onClick={() => navigate('/explore')} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md">
                   View All Freelancers
                 </button>
               </div>

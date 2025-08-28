@@ -117,7 +117,11 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
-      <div className="bg-gradient-to-br from-orange-100 via-purple-100 to-orange-50 py-24 md:py-32 text-center px-4 sm:px-6">
+      <div className="bg-gradient-to-br from-orange-100 via-purple-100 to-orange-50 py-24 md:py-32 text-center px-4 sm:px-6 relative overflow-hidden">
+        {/* Background gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-orange-500/10 to-purple-600/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent"></div>
+        <div className="relative z-10">
         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 animate-pulse">
           Reels Bhi. Rozgaar Bhi.
         </h1>
@@ -153,6 +157,7 @@ const LandingPage = () => {
               Join as a Client
             </button>
           </div>
+        </div>
         </div>
       </div>
 
@@ -220,13 +225,23 @@ const LandingPage = () => {
         </h2>
         <div className="flex overflow-x-auto space-x-6 max-w-7xl mx-auto px-4 pb-6">
           {[
-            { title: 'Crafting Intuitive User Interfaces', name: 'Priya Sharma', views: '13.5K views' },
-            { title: 'Captivating Voiceovers for Brands', name: 'Amit Singh', views: '9.8K views' },
-            { title: 'Engaging Content that Converts', name: 'Sneha Patel', views: '7.5K views' },
-            { title: 'Bringing Ideas to Life Through Design', name: 'Rohan Gupta', views: '5.2K views' },
+            { title: 'Crafting Intuitive User Interfaces', name: 'Priya Sharma', views: '13.5K views', image: '/api/placeholder/300/200/6366f1/ffffff?text=UI+Design' },
+            { title: 'Captivating Voiceovers for Brands', name: 'Amit Singh', views: '9.8K views', image: '/api/placeholder/300/200/ea580c/ffffff?text=Voiceover' },
+            { title: 'Engaging Content that Converts', name: 'Sneha Patel', views: '7.5K views', image: '/api/placeholder/300/200/7c3aed/ffffff?text=Content' },
+            { title: 'Bringing Ideas to Life Through Design', name: 'Rohan Gupta', views: '5.2K views', image: '/api/placeholder/300/200/f59e0b/ffffff?text=Design' },
           ].map((reel, index) => (
             <div key={index} className="min-w-[300px] bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-orange-200 hover:border-orange-400">
-              <div className="bg-gradient-to-br from-purple-300 to-orange-300 h-48 rounded-t-xl"></div>
+              <div className="h-48 rounded-t-xl overflow-hidden">
+                <img 
+                  src={reel.image} 
+                  alt={reel.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.background = `linear-gradient(135deg, ${index % 2 === 0 ? '#7c3aed' : '#ea580c'}, ${index % 2 === 0 ? '#ea580c' : '#7c3aed'})`;
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
               <div className="p-6">
                 <h3 className="font-semibold text-lg mb-2 text-purple-700">{reel.title}</h3>
                 <p className="text-base text-gray-600 mb-1">{reel.name}</p>
