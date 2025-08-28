@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
 import MapWithRadius from "./mapWithRedius";
+import { db } from "./firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function Explore() {
   const [query, setQuery] = useState("");
@@ -12,21 +14,66 @@ export default function Explore() {
   const [rating, setRating] = useState(1);
   const [price, setPrice] = useState(500);
 
-  const allFreelancers = useMemo(() => (
-    Array.from({ length: 24 }).map((_, i) => ({
-      id: i,
-      name: `Freelancer #${i + 1}`,
-      role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
-      category: ["Tech", "Design", "Content", "Media"][i % 4],
-      status: ["Available", "Busy"][i % 2],
-      city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
-      rating: (i % 5) + 1,
-      price: (i % 10) * 50,
-    }))
-  ), []);
+  const [remoteFreelancers, setRemoteFreelancers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "users"));
+        const users = snapshot.docs.map((doc) => {
+          const d = doc.data() || {};
+          return {
+            id: doc.id,
+            name: d.name || d.displayName || "Freelancer",
+            role: d.role || d.specialization || "Professional",
+            category: d.category || "Tech",
+            status: d.status || "Available",
+            city: d.city || d.location || "",
+            rating: typeof d.rating === "number" && d.rating > 0 ? d.rating : 4,
+            price: typeof d.price === "number" ? d.price : 200,
+            reviews: typeof d.reviews === "number" ? d.reviews : 0,
+          };
+        });
+        if (users.length > 0) {
+          setRemoteFreelancers(users);
+        } else {
+          // Fallback demo data for empty DB
+          setRemoteFreelancers(
+            Array.from({ length: 12 }).map((_, i) => ({
+              id: `demo-${i}`,
+              name: `Freelancer #${i + 1}`,
+              role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
+              category: ["Tech", "Design", "Content", "Media"][i % 4],
+              status: ["Available", "Busy"][i % 2],
+              city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
+              rating: (i % 5) + 1,
+              price: (i % 10) * 50,
+              reviews: (i % 20) + 1,
+            }))
+          );
+        }
+      } catch (e) {
+        // Network/permission error fallback
+        setRemoteFreelancers(
+          Array.from({ length: 12 }).map((_, i) => ({
+            id: `offline-${i}`,
+            name: `Freelancer #${i + 1}`,
+            role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
+            category: ["Tech", "Design", "Content", "Media"][i % 4],
+            status: ["Available", "Busy"][i % 2],
+            city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
+            rating: (i % 5) + 1,
+            price: (i % 10) * 50,
+            reviews: (i % 20) + 1,
+          }))
+        );
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const filtered = useMemo(() => {
-    return allFreelancers.filter((f) => {
+    return remoteFreelancers.filter((f) => {
       const matchesQuery = query.trim().length === 0 ||
         f.name.toLowerCase().includes(query.toLowerCase()) ||
         f.role.toLowerCase().includes(query.toLowerCase());
@@ -37,7 +84,7 @@ export default function Explore() {
       const matchesPrice = f.price <= price;
       return matchesQuery && matchesCategory && matchesStatus && matchesLocation && matchesRating && matchesPrice;
     });
-  }, [allFreelancers, query, category, status, location, rating, price]);
+  }, [remoteFreelancers, query, category, status, location, rating, price]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-purple-50 flex font-[Inter]">
@@ -166,14 +213,14 @@ export default function Explore() {
                 <div className="h-24 bg-gray-200 rounded mb-2" />
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
-                <p className="text-xs text-gray-500">⭐ {f.rating} • ₹{f.price}</p>
+                <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
                 <a href="#" className="text-xs text-purple-600 hover:underline">
                   View Profile
                 </a>
               </div>
             ))}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</n+div>
+              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</div>
             )}
           </div>
         </section>

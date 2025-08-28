@@ -20,6 +20,7 @@ const ReelModal = ({
   const [commentingReelId, setCommentingReelId] = useState(null);
   const [loadingVideos, setLoadingVideos] = useState({});
   const [isPlaying, setIsPlaying] = useState(true);
+  const [ratingInput, setRatingInput] = useState(0);
 
   const videoRefs = useRef({});
   const modalContainerRef = useRef(null);
@@ -159,6 +160,25 @@ const ReelModal = ({
     } catch (err) {
       alert("Failed to add comment");
       return Promise.reject(err);
+    }
+  };
+
+  const handleRateReel = async (reelId) => {
+    if (!auth.currentUser) {
+      alert("Please login to rate reels");
+      return;
+    }
+    if (!ratingInput || ratingInput < 1 || ratingInput > 5) return;
+    try {
+      const reelDocRef = doc(db, "reels", reelId);
+      await updateDoc(reelDocRef, {
+        ratingCount: increment(1),
+        ratingTotal: increment(ratingInput),
+      });
+      setRatingInput(0);
+      alert("Thanks for your rating!");
+    } catch (err) {
+      console.error("Failed to rate reel", err);
     }
   };
 
