@@ -743,6 +743,20 @@ const ReelModal = ({
                   }
                 }}
               >
+                {/* Keep video visible in background */}
+                <div className="absolute inset-0 opacity-30">
+                  <video
+                    ref={(el) => {
+                      videoRefs.current[`modal-${index}`] = el;
+                    }}
+                    src={reel.video_url}
+                    className="w-full h-full object-cover"
+                    muted={true}
+                    playsInline
+                    loop
+                    autoPlay
+                  />
+                </div>
                 <div className="w-full flex justify-between items-center p-4 border-b border-white/10">
                   <h3 className="text-white font-bold text-lg">
                     Comments (
