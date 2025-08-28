@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -12,6 +12,7 @@ const auth = getAuth();
 const storage = getStorage(app);
 
 export default function Profile() {
+  const { id: routeProfileId } = useParams();
   const [isBooked, setIsBooked] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
   const [profile, setProfile] = useState({ name: "", address: "", phone: "", skills: "", projects: 0, rating: 0, reviews: 0, about: "", featuredReel: "" });
@@ -34,13 +35,14 @@ export default function Profile() {
       setLoading(true);
       setError("");
       const user = auth.currentUser;
-      if (!user) {
-        setError("User not authenticated");
-        setLoading(false);
-        return;
-      }
       try {
-        const docRef = doc(db, "users", user.uid);
+        const targetUserId = routeProfileId || (user && user.uid);
+        if (!targetUserId) {
+          setError("User not authenticated");
+          setLoading(false);
+          return;
+        }
+        const docRef = doc(db, "users", targetUserId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setProfile(docSnap.data());
@@ -52,7 +54,7 @@ export default function Profile() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [routeProfileId]);
 
   useEffect(() => {
     setAboutForm({ about: profile.about || "", specialization: profile.specialization || "", featuredReel: profile.featuredReel || "" });
