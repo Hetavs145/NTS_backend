@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { auth, db } from "../firebase";
-import { supabase } from "../supabase";
 import { collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ReelUpload = ({ onUploadSuccess }) => {
   const formRef = useRef(null);
@@ -28,41 +28,18 @@ const ReelUpload = ({ onUploadSuccess }) => {
       return;
     }
 
-    const thumbPath = `thumbnails/${crypto.randomUUID()}`;
-    const videoPath = `videos/${crypto.randomUUID()}`;
+    const storage = getStorage();
+    const thumbRef = ref(storage, `reels/${firebaseUser.uid}/thumbnails/${crypto.randomUUID()}`);
+    const videoRef = ref(storage, `reels/${firebaseUser.uid}/videos/${crypto.randomUUID()}`);
 
     setUploadProgress(10);
-    const { data: thumbData, error: thumbErr } = await supabase.storage
-      .from("reels")
-      .upload(thumbPath, thumbnail, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    setUploadProgress(30);
-
-    const { data: videoData, error: videoErr } = await supabase.storage
-      .from("reels")
-      .upload(videoPath, video, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
+    await uploadBytes(thumbRef, thumbnail);
+    setUploadProgress(35);
+    await uploadBytes(videoRef, video);
     setUploadProgress(60);
 
-    if (thumbErr || videoErr) {
-      console.error("Thumbnail upload error:", thumbErr);
-      console.error("Video upload error:", videoErr);
-      alert("Upload failed. See console.");
-      setIsLoading(false);
-      return;
-    }
-
-    const thumbUrl = supabase.storage.from("reels").getPublicUrl(thumbPath)
-      .data.publicUrl;
-    const videoUrl = supabase.storage.from("reels").getPublicUrl(videoPath)
-      .data.publicUrl;
-
+    const thumbUrl = await getDownloadURL(thumbRef);
+    const videoUrl = await getDownloadURL(videoRef);
     setUploadProgress(80);
 
     try {
@@ -82,6 +59,8 @@ const ReelUpload = ({ onUploadSuccess }) => {
         video_url: videoUrl,
         likes: 0,
         shares: 0,
+        ratingTotal: 0,
+        ratingCount: 0,
         comments: [],
         created_at: new Date().toISOString(),
       });

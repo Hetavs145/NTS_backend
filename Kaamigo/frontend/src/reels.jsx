@@ -48,7 +48,27 @@ const Reels = () => {
         reelsData.push({ id: doc.id, ...doc.data() });
       });
       console.log("Fetched reels:", reelsData);
-      setReels(reelsData);
+      if (reelsData.length === 0) {
+        // Fallback dummy reels to demonstrate UI when no content present
+        setReels([
+          {
+            id: "demo-1",
+            title: "Sample Design Reel",
+            description: "A short showcase of UI animations",
+            category: "Design",
+            tags: ["ui", "animation"],
+            user_id: "demo-user",
+            thumbnail_url: "https://via.placeholder.com/400x700?text=Design+Reel",
+            video_url: "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+            likes: 0,
+            shares: 0,
+            comments: [],
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      } else {
+        setReels(reelsData);
+      }
 
       // Fetch user profiles for all reels
       const uniqueUserIds = [...new Set(reelsData.map((reel) => reel.user_id))];

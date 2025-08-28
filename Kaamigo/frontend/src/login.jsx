@@ -8,7 +8,8 @@ import {
 import { auth } from "./firebase";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
-import { supabase } from "./supabase";
+import { db } from "./firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -45,13 +46,14 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      // ✅ Add Supabase sync here
-      await supabase.from("users").upsert({
+      // ✅ Sync user to Firestore users collection
+      await setDoc(doc(db, "users", auth.currentUser.uid), {
         id: auth.currentUser.uid,
         email: auth.currentUser.email,
-        name: auth.currentUser.displayName || "", // fallback if null
+        name: auth.currentUser.displayName || "",
         photoUrl: auth.currentUser.photoURL || "",
-      });
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       navigate("/explore");
     } catch (err) {
       console.error("Login error:", err);
@@ -83,13 +85,14 @@ export default function LoginPage() {
       const authProvider = new GoogleAuthProvider();
       await signInWithPopup(auth, authProvider);
 
-      // ✅ Add Supabase sync here
-      await supabase.from("users").upsert({
+      // ✅ Sync user to Firestore users collection
+      await setDoc(doc(db, "users", auth.currentUser.uid), {
         id: auth.currentUser.uid,
         email: auth.currentUser.email,
         name: auth.currentUser.displayName || "",
         photoUrl: auth.currentUser.photoURL || "",
-      });
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       navigate("/explore");
     } catch (err) {
       console.error("Social login failed:", err);
