@@ -91,9 +91,9 @@ const AboutPage = () => {
             Subscribe
           </button>
           <div className="flex gap-4 mt-4">
-            <a href="#"><FaInstagram className="text-pink-500 text-xl" /></a>
-            <a href="#"><FaLinkedin className="text-blue-700 text-xl" /></a>
-            <a href="#"><FaTwitter className="text-blue-500 text-xl" /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram className="text-pink-500 text-xl" /></a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer"><FaLinkedin className="text-blue-700 text-xl" /></a>
+            <a href="https://twitter.com" target="_blank" rel="noreferrer"><FaTwitter className="text-blue-500 text-xl" /></a>
             <a href="mailto:info@kaamigo.com"><FaEnvelope className="text-gray-600 text-xl" /></a>
           </div>
         </div>

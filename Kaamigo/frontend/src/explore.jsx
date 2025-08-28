@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
 import MapWithRadius from "./mapWithRedius";
@@ -7,7 +7,12 @@ import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 export default function Explore() {
-  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const featuredRef = useRef(null);
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const initialQ = params.get('q') || "";
+  const [query, setQuery] = useState(initialQ);
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [location, setLocation] = useState("");
@@ -179,9 +184,9 @@ export default function Explore() {
                   <div>
                     <p className="font-semibold text-sm">Name #{i + 1}</p>
                     <p className="text-sm text-gray-500">Web Designer</p>
-                    <a href="#" className="text-sm text-purple-600 hover:underline">
+                    <button onClick={() => navigate(`/profile/demo-${i}`)} className="text-sm text-purple-600 hover:underline">
                       View Profile
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -196,7 +201,7 @@ export default function Explore() {
                 <MapWithRadius />
               </div>
               <div className="text-center mt-4">
-                <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                <button onClick={() => featuredRef.current?.scrollIntoView({ behavior: 'smooth' })} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
                   View All Freelancers
                 </button>
               </div>
@@ -205,7 +210,7 @@ export default function Explore() {
         </div>
 
         {/* Featured Freelancers */}
-        <section className="mt-10">
+        <section ref={featuredRef} className="mt-10">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers Nearby</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filtered.map((f) => (
@@ -214,9 +219,9 @@ export default function Explore() {
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
                 <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <a href="#" className="text-xs text-purple-600 hover:underline">
+                <button onClick={() => navigate(`/profile/${f.id}`)} className="text-xs text-purple-600 hover:underline">
                   View Profile
-                </a>
+                </button>
               </div>
             ))}
             {filtered.length === 0 && (

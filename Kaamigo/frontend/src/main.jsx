@@ -41,6 +41,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/explore/reels" element={<Reels/>} />
         <Route path="/explore/jobs" element={<Jobs/>} />
         <Route path="/explore/profile" element={<Profile/>} />
+        <Route path="/profile/:id" element={<Profile/>} />
         <Route path="/explore/features" element={<Features/>} />
         <Route path="/explore/how-it-works" element={<HowItWorks/>} />
         <Route path="/explore/featurebtn" element={<FeatureBtn/>} />

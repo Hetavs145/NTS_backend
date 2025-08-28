@@ -108,7 +108,7 @@ const Coins = () => {
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <div className="text-orange-500 font-bold flex items-center"><span className="mr-1">🪙</span>{task.coins} Coins</div>
-                    <button className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold">Start Task</button>
+                    <Link to="/coming-soon" className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold text-center">Start Task</Link>
                   </div>
                 </div>
               ))}
