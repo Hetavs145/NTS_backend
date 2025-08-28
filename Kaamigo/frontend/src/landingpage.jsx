@@ -1,5 +1,6 @@
 // LandingPage.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
@@ -86,6 +87,7 @@ const Navbar = () => {
 
 // Landing Page
 const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
@@ -111,7 +113,7 @@ const LandingPage = () => {
 
         {/* Call-to-action Buttons */}
         <div className="flex justify-center flex-wrap gap-4">
-          <button className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+          <button onClick={() => navigate('/coming-soon')} className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
             📥 Download the App
           </button>
           <button className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
@@ -245,7 +247,7 @@ const LandingPage = () => {
               Experience voice-first freelancing on the go. Download our app for seamless connections and endless opportunities.
             </p>
             <div className="flex justify-center md:justify-start gap-6 flex-wrap">
-              <button className="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+              <button onClick={() => navigate('/coming-soon')} className="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
                 📱 Download on Android
               </button>
               <button className="border-2 border-purple-400 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg">
@@ -259,10 +261,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white text-center py-6 border-t text-sm text-gray-600">
-        © {new Date().getFullYear()} Kaamigo. All rights reserved.
-      </footer>
+      {/* footer rendered globally */}
 
     </div>
   );

@@ -99,12 +99,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#181B23] py-6 text-center text-gray-300 text-sm">
-        <div className="text-purple-400 font-bold text-xl mb-1">Kaamigo</div>
-        <div>Voice-first job discovery for the next billion users.</div>
-        <div className="text-gray-500 text-xs mt-1">© 2025 Kaamigo. All rights reserved.</div>
-      </footer>
+      {/* footer rendered globally */}
     </div>
   );
 };

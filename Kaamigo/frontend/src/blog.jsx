@@ -1,4 +1,5 @@
 import React from 'react';
+// footer is rendered globally from router
 
 const blogs = [
   {
@@ -81,6 +82,7 @@ const Blog = () => {
           Explore Stories
         </button>
       </div>
+      {/* footer rendered globally */}
     </div>
   );
 };

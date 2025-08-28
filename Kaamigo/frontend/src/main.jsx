@@ -21,6 +21,8 @@ import Features from "./feature.jsx";
 import HowItWorks from "./howItWork.jsx";
 import FeatureBtn from "./premium.jsx";
 import PersonalDetails from "./personalDetails.jsx";
+import Footer from "./components/Footer.jsx";
+import ComingSoon from "./pages/ComingSoon.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -43,7 +45,9 @@ createRoot(document.getElementById("root")).render(
         <Route path="/explore/how-it-works" element={<HowItWorks/>} />
         <Route path="/explore/featurebtn" element={<FeatureBtn/>} />
         <Route path="/dashboard" element={<PersonalDetails/>} />
+        <Route path="/coming-soon" element={<ComingSoon/>} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   </StrictMode>
 );
