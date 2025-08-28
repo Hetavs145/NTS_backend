@@ -164,9 +164,9 @@ const handleSubmit = async (e) => {
           {/* budget row */}
           <div className="flex gap-4">
             <div className="flex-1">
-                              <label htmlFor="budgetMin" className="block text-base font-semibold mb-1">
-                  Budget min (₹)
-                </label>
+              <label htmlFor="budgetMin" className="block text-base font-semibold mb-1">
+                Budget min ($)
+              </label>
               <input
                 type="number"
                 id="budgetMin"
@@ -178,9 +178,9 @@ const handleSubmit = async (e) => {
               />
             </div>
             <div className="flex-1">
-                              <label htmlFor="budgetMax" className="block text-base font-semibold mb-1">
-                  Budget max (₹)
-                </label>
+              <label htmlFor="budgetMax" className="block text-base font-semibold mb-1">
+                Budget max ($)
+              </label>
               <input
                 type="number"
                 id="budgetMax"

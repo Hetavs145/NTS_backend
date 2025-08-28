@@ -11,49 +11,31 @@ export default function Features() {
       title: "Dynamic Video Reels",
       desc: "Discover freelancers through captivating short video reels, bringing their skills to life.",
       icon: "🎥",
-      action: "Learn More",
-      redirect: "/explore/reels",
-      image: "/api/placeholder/400/250/7c3aed/ffffff?text=Video+Reels"
     },
     {
       title: "Intuitive Voice Search",
       desc: "Find what you need hands-free with voice commands, simplifying your search.",
       icon: "🎤",
-      action: "Try Now",
-      redirect: "/explore/profile",
-      image: "/api/placeholder/400/250/ea580c/ffffff?text=Voice+Search"
     },
     {
       title: "Real-time Map Discovery",
       desc: "Locate professionals on a live, interactive map. Filter by needs, location, and more.",
       icon: "🗺️",
-      action: "Explore",
-      redirect: "/explore",
-      image: "/api/placeholder/400/250/6366f1/ffffff?text=Map+Discovery"
     },
     {
       title: "Certified Trust Badges",
       desc: "Verify freelancer credentials with badges, ensuring reliability and peace of mind.",
       icon: "✅",
-      action: "View Badges",
-      redirect: "/explore/profile",
-      image: "/api/placeholder/400/250/10b981/ffffff?text=Trust+Badges"
     },
     {
       title: "Secure & Simple Payments",
       desc: "Effortless transactions with multiple payment options for convenience.",
       icon: "💳",
-      action: "Coming Soon",
-      redirect: "#",
-      image: "/api/placeholder/400/250/f59e0b/ffffff?text=Payments"
     },
     {
       title: "Dedicated 24/7 Support",
       desc: "Access help whenever needed, with a professional team ready to assist.",
       icon: "🕐",
-      action: "Coming Soon",
-      redirect: "#",
-      image: "/api/placeholder/400/250/ef4444/ffffff?text=Support"
     },
   ];
 
@@ -118,28 +100,10 @@ export default function Features() {
                 key={item.title}
                 className="bg-white p-6 rounded-lg text-center shadow hover:shadow-lg transition-transform transform hover:scale-105"
               >
-                <div className="mb-4">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-32 object-cover rounded-lg mb-3"
-                    onError={(e) => {
-                      e.target.style.background = `linear-gradient(135deg, #7c3aed, #ea580c)`;
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
                 <div className="text-4xl mb-3">{item.icon}</div>
                 <h4 className="text-xl font-semibold text-orange-600 mb-2">{item.title}</h4>
                 <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-                <button
-                  onClick={() => item.redirect !== "#" ? navigate(item.redirect) : null}
-                  className={`text-purple-600 text-sm underline hover:text-purple-800 transition-colors ${
-                    item.redirect === "#" ? "cursor-default opacity-60" : "cursor-pointer"
-                  }`}
-                >
-                  {item.action}
-                </button>
+                <a href="#" className="text-purple-600 text-sm underline">Learn More</a>
               </div>
             ))}
           </div>

@@ -43,12 +43,6 @@ export default function FeatureBtn() {
 
       {/* Main Content */}
       <main className="flex-1 p-6 md:ml-64">
-        {/* Mobile Navigation Toggle */}
-        <div className="md:hidden mb-6">
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg">
-            Menu
-          </button>
-        </div>
         {/* Hero Section */}
         <section className="bg-gradient-to-t from-orange-200 to-yellow-200 text-center py-12 px-4 rounded-lg mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">

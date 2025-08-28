@@ -102,11 +102,6 @@ export default function Profile() {
     window.location.href = '/explore?chat=true';
   };
 
-  const handleHire = () => {
-    // Redirect to chatbot
-    window.location.href = '/explore?chat=true';
-  };
-
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
@@ -250,7 +245,10 @@ export default function Profile() {
     setProfile({ ...profile, services: newServices });
   };
 
-
+  const handleHire = () => {
+    // Redirect to jobs page for hiring
+    window.location.href = '/explore/jobs';
+  };
   const handleAddTestimonial = () => {
     setTestimonialForm((prev) => [...prev, { name: '', text: '', date: '' }]);
   };
@@ -370,7 +368,7 @@ export default function Profile() {
                     type="file"
                     accept="image/*"
                     onChange={handleProfilePicUpload}
-                    className="w-full mb-4 p-2 border-2 border-dashed border-gray-300 rounded-full text-center"
+                    className="w-full mb-4"
                   />
                   <div className="flex gap-2">
                     <button
@@ -385,9 +383,7 @@ export default function Profile() {
             )}
 
             <h2 className="font-bold text-lg p-1 text-orange-500">{profile.name || "Name"}</h2>
-            {profile.userType === 'freelancer' && (
-              <p className="text-sm text-gray-600 p-1">{profile.skills || "Skills"}</p>
-            )}
+            <p className="text-sm text-gray-600 p-1">{profile.skills || "Skills"}</p>
             <div className="flex justify-center gap-5 mt-2 text-sm text-gray-500">
               {profile.rating && (
                 <div>
@@ -399,11 +395,9 @@ export default function Profile() {
                   <span className="block font-bold text-black">{profile.reviews}</span>Reviews
                 </div>
               )}
-              {profile.userType === 'freelancer' && (
-                <div>
-                  <span className="block font-bold text-black">{profile.projects || "-"}</span>Projects
-                </div>
-              )}
+              <div>
+                <span className="block font-bold text-black">{profile.projects || "-"}</span>Projects
+              </div>
             </div>
             <button
               onClick={handleBook}
@@ -413,7 +407,7 @@ export default function Profile() {
             </button>
             <button
               onClick={handleMessage}
-              className="mt-4 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100"
+              className="mt-2 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100"
             >
               {messageSent ? "Message Sent" : "Send Message"}
             </button>
@@ -460,9 +454,16 @@ export default function Profile() {
               </li>
               <li className="flex items-center justify-between">
                 <span>Email</span>
-                <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                  Verified
-                </span>
+                <button
+                  onClick={() => handleVerificationUpdate('email', !profile.verification.email)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.email 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.email ? 'Verified' : 'Verify'}
+                </button>
               </li>
               <li className="flex items-center justify-between">
                 <span>Address</span>
@@ -503,15 +504,8 @@ export default function Profile() {
                 <input name="name" value={profile.name} onChange={handleChange} placeholder="Name" className="w-full p-2 border rounded" />
                 <input name="address" value={profile.address} onChange={handleChange} placeholder="Address" className="w-full p-2 border rounded" />
                 <input name="phone" value={profile.phone} onChange={handleChange} placeholder="Phone" className="w-full p-2 border rounded" />
-                {profile.userType === 'freelancer' && (
-                  <>
-                    <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
-                    <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
-                  </>
-                )}
-                {profile.userType === 'client' && (
-                  <input name="bio" value={profile.bio || ''} onChange={handleChange} placeholder="Bio" className="w-full p-2 border rounded" />
-                )}
+                <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
+                <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
                 <button onClick={handleSave} disabled={saving} className="bg-orange-500 text-white px-4 py-2 rounded">{saving ? "Saving..." : "Save"}</button>
                 <button onClick={() => setEdit(false)} className="ml-2 px-4 py-2 border rounded">Cancel</button>
               </div>
@@ -520,36 +514,23 @@ export default function Profile() {
                 <div><b>Name:</b> {profile.name}</div>
                 <div><b>Address:</b> {profile.address}</div>
                 <div><b>Phone:</b> {profile.phone}</div>
-                {profile.userType === 'freelancer' && (
-                  <>
-                    <div><b>Skills:</b> {profile.skills}</div>
-                    <div><b>Projects:</b> {profile.projects}</div>
-                  </>
-                )}
-                {profile.userType === 'client' && (
-                  <div><b>Bio:</b> {profile.bio || 'No bio added yet'}</div>
-                )}
+                <div><b>Skills:</b> {profile.skills}</div>
+                <div><b>Projects:</b> {profile.projects}</div>
                 <button onClick={() => setEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit</button>
               </div>
             )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-xl font-bold">
-              {profile.userType === 'client' ? 'Bio' : 'About Me'}
-            </h2>
+            <h2 className="text-xl font-bold">About Me</h2>
             {aboutEdit ? (
               <div className="space-y-3">
-                <textarea name="about" value={aboutForm.about} onChange={handleAboutChange} placeholder={profile.userType === 'client' ? 'Bio' : 'About Me'} className="w-full p-2 border rounded" />
-                {profile.userType === 'freelancer' && (
-                  <>
-                    <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
-                                    <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
-                <input type="file" accept="video/*" onChange={handleReelUpload} className="w-full p-2 border-2 border-dashed border-gray-300 rounded-full text-center" />
-                    {aboutForm.featuredReel && (
-                      <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
-                    )}
-                  </>
+                <textarea name="about" value={aboutForm.about} onChange={handleAboutChange} placeholder="About Me" className="w-full p-2 border rounded" />
+                <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
+                <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
+                <input type="file" accept="video/*" onChange={handleReelUpload} className="w-full" />
+                {aboutForm.featuredReel && (
+                  <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
                 )}
                 <button
                   onClick={handleAboutSave}
@@ -563,166 +544,127 @@ export default function Profile() {
             ) : (
               <div>
                 <p className="text-gray-700 text-sm">{profile.about}</p>
-                {profile.userType === 'freelancer' && (
-                  <>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                      <h3 className="text-sm text-gray-600">🔹 Specialization <span className="text-purple-600 ml-2">{profile.specialization}</span></h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  <h3 className="text-sm text-gray-600">🔹 Specialization <span className="text-purple-600 ml-2">{profile.specialization}</span></h3>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Featured Reel</h3>
+                  {profile.featuredReel ? (
+                    <video src={profile.featuredReel} controls className="w-full h-48 rounded-lg" />
+                  ) : (
+                    <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center text-gray-500">
+                      🎞️ Featured Video
                     </div>
-                    <div className="mt-4">
-                      <h3 className="font-semibold mb-2">Featured Reel</h3>
-                      {profile.featuredReel ? (
-                        <video src={profile.featuredReel} controls className="w-full h-48 rounded-lg" />
-                      ) : (
-                        <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center text-gray-500">
-                          🎞️ Featured Video
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-                <button onClick={() => setAboutEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">
-                  Edit {profile.userType === 'client' ? 'Bio' : 'About Me'}
-                </button>
+                  )}
+                </div>
+                <button onClick={() => setAboutEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit About Me</button>
               </div>
             )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">
-                {profile.userType === 'client' ? 'Open Gigs' : 'My Services'}
-              </h3>
-              {!edit && profile.userType === 'freelancer' && (
-                <button 
-                  onClick={() => setEdit(true)} 
-                  className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
-                >
-                  Edit Services
-                </button>
-              )}
-            </div>
-            {profile.userType === 'client' ? (
-              <div className="space-y-4">
-                <div className="text-center py-8 text-gray-500">
-                  <div className="text-4xl mb-2">📋</div>
-                  <p>No open gigs yet</p>
-                  <button 
-                    onClick={() => navigate('/explore/jobs')} 
-                    className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                  >
-                    Post a Job
-                  </button>
+            <h3 className="font-bold mb-4 text-lg">My Services</h3>
+            {edit ? (
+              <div className="space-y-3">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                  {["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"].map((title, index) => (
+                    <div key={title} className="border p-4 rounded-lg">
+                      <input 
+                        value={profile.services?.[index]?.title || title} 
+                        onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
+                        className="w-full p-2 border rounded mb-2 font-semibold text-sm"
+                        placeholder="Service Title"
+                      />
+                      <textarea 
+                        value={profile.services?.[index]?.description || "Detailed service description goes here."} 
+                        onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
+                        className="w-full p-2 border rounded text-xs text-gray-600"
+                        placeholder="Service Description"
+                        rows="3"
+                      />
+                    </div>
+                  ))}
                 </div>
+                <button onClick={handleSave} disabled={saving} className="bg-purple-500 text-white px-4 py-2 rounded">
+                  {saving ? "Saving..." : "Save Services"}
+                </button>
               </div>
             ) : (
-              <>
-                {edit ? (
-                  <div className="space-y-3">
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                      {["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"].map((title, index) => (
-                        <div key={title} className="border p-4 rounded-lg">
-                          <input 
-                            value={profile.services?.[index]?.title || title} 
-                            onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
-                            className="w-full p-2 border rounded mb-2 font-semibold text-sm"
-                            placeholder="Service Title"
-                          />
-                          <textarea 
-                            value={profile.services?.[index]?.description || "Detailed service description goes here."} 
-                            onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
-                            className="w-full p-2 border rounded text-xs text-gray-600"
-                            placeholder="Service Description"
-                            rows="3"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <button onClick={handleSave} disabled={saving} className="bg-purple-500 text-white px-4 py-2 rounded">
-                      {saving ? "Saving..." : "Save Services"}
-                    </button>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 text-sm">
+                {(profile.services || ["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"]).map((service, index) => (
+                  <div key={index} className="border p-6 rounded-lg text-center bg-white shadow">
+                    <h4 className="font-semibold text-sm mb-1">
+                      {typeof service === 'string' ? service : service.title || `Service ${index + 1}`}
+                    </h4>
+                    <p className="text-xs text-gray-600">
+                      {typeof service === 'string' ? "Detailed service description goes here." : service.description || "Detailed service description goes here."}
+                    </p>
                   </div>
-                ) : (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 text-sm">
-                    {(profile.services || ["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"]).map((service, index) => (
-                      <div key={index} className="border p-6 rounded-lg text-center bg-white shadow">
-                        <h4 className="font-semibold text-sm mb-1">
-                          {typeof service === 'string' ? service : service.title || `Service ${index + 1}`}
-                        </h4>
-                        <p className="text-xs text-gray-600">
-                          {typeof service === 'string' ? "Detailed service description goes here." : service.description || "Detailed service description goes here."}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
+                ))}
+              </div>
             )}
           </div>
 
-          {profile.userType === 'freelancer' && (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="font-bold mb-4 text-lg">Portfolio</h3>
-              {portfolioEdit ? (
-                <div>
-                  {portfolioForm.map((item, idx) => (
-                    <div key={idx} className="mb-2 flex gap-2 items-center">
-                      <input value={item.title} onChange={e => handlePortfolioChange(idx, 'title', e.target.value)} placeholder="Project Title" className="p-2 border rounded w-1/3" />
-                      <input value={item.url} onChange={e => handlePortfolioChange(idx, 'url', e.target.value)} placeholder="Image/Link URL" className="p-2 border rounded w-1/2" />
-                      <button onClick={() => handleRemovePortfolio(idx)} className="text-red-500">Remove</button>
-                    </div>
-                  ))}
-                  <button onClick={handleAddPortfolio} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Add Project</button>
-                  <button onClick={handlePortfolioSave} disabled={portfolioSaving} className="bg-orange-500 text-white px-2 py-1 rounded">{portfolioSaving ? "Saving..." : "Save"}</button>
-                  <button onClick={() => setPortfolioEdit(false)} className="ml-2 px-2 py-1 border rounded">Cancel</button>
-                </div>
-              ) : (
-                <div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
-                    {(profile.portfolio || []).map((item, i) => (
-                      <div key={i} className="bg-gray-100 h-32 rounded flex items-center justify-center text-sm text-gray-500">
-                        {item.url ? <img src={item.url} alt={item.title} className="h-full w-full object-cover rounded" /> : item.title || `Project ${i + 1}`}
-                      </div>
-                    ))}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="font-bold mb-4 text-lg">Portfolio</h3>
+            {portfolioEdit ? (
+              <div>
+                {portfolioForm.map((item, idx) => (
+                  <div key={idx} className="mb-2 flex gap-2 items-center">
+                    <input value={item.title} onChange={e => handlePortfolioChange(idx, 'title', e.target.value)} placeholder="Project Title" className="p-2 border rounded w-1/3" />
+                    <input value={item.url} onChange={e => handlePortfolioChange(idx, 'url', e.target.value)} placeholder="Image/Link URL" className="p-2 border rounded w-1/2" />
+                    <button onClick={() => handleRemovePortfolio(idx)} className="text-red-500">Remove</button>
                   </div>
-                  <button onClick={() => setPortfolioEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Portfolio</button>
+                ))}
+                <button onClick={handleAddPortfolio} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Add Project</button>
+                <button onClick={handlePortfolioSave} disabled={portfolioSaving} className="bg-orange-500 text-white px-2 py-1 rounded">{portfolioSaving ? "Saving..." : "Save"}</button>
+                <button onClick={() => setPortfolioEdit(false)} className="ml-2 px-2 py-1 border rounded">Cancel</button>
+              </div>
+            ) : (
+              <div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+                  {(profile.portfolio || []).map((item, i) => (
+                    <div key={i} className="bg-gray-100 h-32 rounded flex items-center justify-center text-sm text-gray-500">
+                      {item.url ? <img src={item.url} alt={item.title} className="h-full w-full object-cover rounded" /> : item.title || `Project ${i + 1}`}
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
+                <button onClick={() => setPortfolioEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Portfolio</button>
+              </div>
+            )}
+          </div>
 
-          {profile.userType === 'freelancer' && (
-            <div className="bg-white p-10 rounded-lg shadow">
-              <h3 className="font-bold mb-4 text-lg">What Clients Say</h3>
-              {testimonialEdit ? (
-                <div>
-                  {testimonialForm.map((item, idx) => (
-                    <div key={idx} className="mb-2 flex gap-2 items-center">
-                      <input value={item.name} onChange={e => handleTestimonialChange(idx, 'name', e.target.value)} placeholder="Client Name" className="p-2 border rounded w-1/4" />
-                      <input value={item.text} onChange={e => handleTestimonialChange(idx, 'text', e.target.value)} placeholder="Testimonial" className="p-2 border rounded w-1/2" />
-                      <input value={item.date} onChange={e => handleTestimonialChange(idx, 'date', e.target.value)} placeholder="Date" className="p-2 border rounded w-1/4" />
-                      <button onClick={() => handleRemoveTestimonial(idx)} className="text-red-500">Remove</button>
+          <div className="bg-white p-10 rounded-lg shadow">
+            <h3 className="font-bold mb-4 text-lg">What Clients Say</h3>
+            {testimonialEdit ? (
+              <div>
+                {testimonialForm.map((item, idx) => (
+                  <div key={idx} className="mb-2 flex gap-2 items-center">
+                    <input value={item.name} onChange={e => handleTestimonialChange(idx, 'name', e.target.value)} placeholder="Client Name" className="p-2 border rounded w-1/4" />
+                    <input value={item.text} onChange={e => handleTestimonialChange(idx, 'text', e.target.value)} placeholder="Testimonial" className="p-2 border rounded w-1/2" />
+                    <input value={item.date} onChange={e => handleTestimonialChange(idx, 'date', e.target.value)} placeholder="Date" className="p-2 border rounded w-1/4" />
+                    <button onClick={() => handleRemoveTestimonial(idx)} className="text-red-500">Remove</button>
+                  </div>
+                ))}
+                <button onClick={handleAddTestimonial} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Add Testimonial</button>
+                <button onClick={handleTestimonialSave} disabled={testimonialSaving} className="bg-orange-500 text-white px-2 py-1 rounded">{testimonialSaving ? "Saving..." : "Save"}</button>
+                <button onClick={() => setTestimonialEdit(false)} className="ml-2 px-2 py-1 border rounded">Cancel</button>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                {(profile.testimonials || []).map((item, i) => (
+                  <div key={i} className="border p-6 rounded space-y-2">
+                    <p>{item.text}</p>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">👤</div>
+                      <p className="text-gray-500 text-xs">– {item.name}, {item.date}</p>
                     </div>
-                  ))}
-                  <button onClick={handleAddTestimonial} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Add Testimonial</button>
-                  <button onClick={handleTestimonialSave} disabled={testimonialSaving} className="bg-orange-500 text-white px-2 py-1 rounded">{testimonialSaving ? "Saving..." : "Save"}</button>
-                  <button onClick={() => setTestimonialEdit(false)} className="ml-2 px-2 py-1 border rounded">Cancel</button>
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                  {(profile.testimonials || []).map((item, i) => (
-                    <div key={i} className="border p-6 rounded space-y-2">
-                      <p>{item.text}</p>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">👤</div>
-                        <p className="text-gray-500 text-xs">– {item.name}, {item.date}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <button onClick={() => setTestimonialEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Testimonials</button>
-                </div>
-              )}
-            </div>
-          )}
+                  </div>
+                ))}
+                <button onClick={() => setTestimonialEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Testimonials</button>
+              </div>
+            )}
+          </div>
         </div>
 
         <button
