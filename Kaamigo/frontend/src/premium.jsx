@@ -42,7 +42,7 @@ export default function FeatureBtn() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:ml-64">
+      <main className="flex-1 p-4 md:p-6 md:ml-64">
         {/* Hero Section */}
         <section className="bg-gradient-to-t from-orange-200 to-yellow-200 text-center py-12 px-4 rounded-lg mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -194,12 +194,7 @@ export default function FeatureBtn() {
 
         {/* footer rendered globally */}
 
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-4 right-4 bg-orange-600 text-white px-3 py-2 rounded-full shadow hover:bg-gradient-to-r from-orange-400 to-yellow-500 transition duration-300"
-        >
-          Go Back
-        </button>
+
       </main>
     </div>
   );

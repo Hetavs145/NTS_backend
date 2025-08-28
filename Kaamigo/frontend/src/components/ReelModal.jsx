@@ -33,6 +33,14 @@ const ReelModal = ({
     (r) => selectedCategory === "All" || r.category === selectedCategory
   );
 
+  // Reset comment state when modal opens
+  useEffect(() => {
+    if (showModal) {
+      setCommentingReelId(null);
+      setCommentInput("");
+    }
+  }, [showModal]);
+
   // Format count numbers (1K, 1M, etc)
   const formatCount = (count) => {
     if (!count && count !== 0) return 0;
@@ -84,6 +92,10 @@ const ReelModal = ({
   const closeReelModal = () => {
     onClose();
     document.body.style.overflow = "auto";
+
+    // Reset comment state
+    setCommentingReelId(null);
+    setCommentInput("");
 
     // Pause all videos
     Object.values(videoRefs.current).forEach((video) => {

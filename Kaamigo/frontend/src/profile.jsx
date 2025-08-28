@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaCamera, FaEdit } from "react-icons/fa";
+import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaCamera, FaEdit, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -407,7 +407,7 @@ export default function Profile() {
             </button>
             <button
               onClick={handleMessage}
-              className="mt-2 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100"
+              className="mt-4 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100"
             >
               {messageSent ? "Message Sent" : "Send Message"}
             </button>
@@ -419,6 +419,15 @@ export default function Profile() {
                 className="mt-2 bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition-colors"
               >
                 Hire a Freelancer
+              </button>
+            )}
+            {/* Show Browse Jobs button only for freelancers */}
+            {profile.userType === 'freelancer' && (
+              <button
+                onClick={() => window.location.href = '/explore/jobs'}
+                className="mt-2 bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors"
+              >
+                Browse Jobs
               </button>
             )}
           </div>
@@ -504,8 +513,12 @@ export default function Profile() {
                 <input name="name" value={profile.name} onChange={handleChange} placeholder="Name" className="w-full p-2 border rounded" />
                 <input name="address" value={profile.address} onChange={handleChange} placeholder="Address" className="w-full p-2 border rounded" />
                 <input name="phone" value={profile.phone} onChange={handleChange} placeholder="Phone" className="w-full p-2 border rounded" />
-                <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
-                <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
+                    <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
+                  </>
+                )}
                 <button onClick={handleSave} disabled={saving} className="bg-orange-500 text-white px-4 py-2 rounded">{saving ? "Saving..." : "Save"}</button>
                 <button onClick={() => setEdit(false)} className="ml-2 px-4 py-2 border rounded">Cancel</button>
               </div>
@@ -514,24 +527,42 @@ export default function Profile() {
                 <div><b>Name:</b> {profile.name}</div>
                 <div><b>Address:</b> {profile.address}</div>
                 <div><b>Phone:</b> {profile.phone}</div>
-                <div><b>Skills:</b> {profile.skills}</div>
-                <div><b>Projects:</b> {profile.projects}</div>
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <div><b>Skills:</b> {profile.skills}</div>
+                    <div><b>Projects:</b> {profile.projects}</div>
+                  </>
+                )}
                 <button onClick={() => setEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit</button>
               </div>
             )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-xl font-bold">About Me</h2>
+            <h2 className="text-xl font-bold">
+              {profile.userType === 'client' ? 'Bio' : 'About Me'}
+            </h2>
             {aboutEdit ? (
               <div className="space-y-3">
-                <textarea name="about" value={aboutForm.about} onChange={handleAboutChange} placeholder="About Me" className="w-full p-2 border rounded" />
-                <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
-                <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
-                <input type="file" accept="video/*" onChange={handleReelUpload} className="w-full" />
-                {aboutForm.featuredReel && (
-                  <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
+                <textarea 
+                  name="about" 
+                  value={aboutForm.about} 
+                  onChange={handleAboutChange} 
+                  placeholder={profile.userType === 'client' ? 'Tell us about your business or what you\'re looking for...' : 'About Me'} 
+                  className="w-full p-2 border rounded" 
+                />
+                {profile.userType === 'freelancer' && (
+                  <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
                 )}
+                                  {profile.userType === 'freelancer' && (
+                    <>
+                      <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
+                      <input type="file" accept="video/*" onChange={handleReelUpload} className="w-full" />
+                      {aboutForm.featuredReel && (
+                        <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
+                      )}
+                    </>
+                  )}
                 <button
                   onClick={handleAboutSave}
                   disabled={aboutSaving || (aboutForm.featuredReel === '' && aboutSaving)}
@@ -544,9 +575,12 @@ export default function Profile() {
             ) : (
               <div>
                 <p className="text-gray-700 text-sm">{profile.about}</p>
+                {profile.userType === 'freelancer' && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                   <h3 className="text-sm text-gray-600">🔹 Specialization <span className="text-purple-600 ml-2">{profile.specialization}</span></h3>
                 </div>
+                )}
+                {profile.userType === 'freelancer' && (
                 <div className="mt-4">
                   <h3 className="font-semibold mb-2">Featured Reel</h3>
                   {profile.featuredReel ? (
@@ -557,14 +591,27 @@ export default function Profile() {
                     </div>
                   )}
                 </div>
+                )}
                 <button onClick={() => setAboutEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit About Me</button>
               </div>
             )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="font-bold mb-4 text-lg">My Services</h3>
-            {edit ? (
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-lg">
+                {profile.userType === 'client' ? 'Open Gigs' : 'My Services'}
+              </h3>
+              {profile.userType === 'freelancer' && (
+                <button 
+                  onClick={() => setEdit(!edit)} 
+                  className="bg-purple-500 text-white px-3 py-1 rounded text-sm hover:bg-purple-600 transition-colors"
+                >
+                  {edit ? 'Cancel' : 'Edit'}
+                </button>
+              )}
+            </div>
+            {edit && profile.userType === 'freelancer' ? (
               <div className="space-y-3">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
                   {["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"].map((title, index) => (
@@ -589,6 +636,19 @@ export default function Profile() {
                   {saving ? "Saving..." : "Save Services"}
                 </button>
               </div>
+            ) : profile.userType === 'client' ? (
+              <div className="space-y-4">
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-lg mb-2">No open gigs yet</p>
+                  <p className="text-sm">Post your first job requirement to get started!</p>
+                  <button 
+                    onClick={() => window.location.href = '/explore/jobs'}
+                    className="mt-3 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Post a Job
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 text-sm">
                 {(profile.services || ["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"]).map((service, index) => (
@@ -598,13 +658,15 @@ export default function Profile() {
                     </h4>
                     <p className="text-xs text-gray-600">
                       {typeof service === 'string' ? "Detailed service description goes here." : service.description || "Detailed service description goes here."}
-                    </p>
+                                         </p>
                   </div>
                 ))}
               </div>
             )}
           </div>
+          )}
 
+          {profile.userType === 'freelancer' && (
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="font-bold mb-4 text-lg">Portfolio</h3>
             {portfolioEdit ? (
@@ -633,7 +695,9 @@ export default function Profile() {
               </div>
             )}
           </div>
+          )}
 
+          {profile.userType === 'freelancer' && (
           <div className="bg-white p-10 rounded-lg shadow">
             <h3 className="font-bold mb-4 text-lg">What Clients Say</h3>
             {testimonialEdit ? (
