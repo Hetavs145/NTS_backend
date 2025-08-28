@@ -106,6 +106,20 @@ export default function LoginPage() {
           <h2 className="text-2xl font-bold text-[#6B5AED] mb-4">Login</h2>
           <h3 className="text-lg font-semibold mb-6">Begin your journey</h3>
 
+          {/* Social on top to match signup */}
+          <button
+            onClick={handleSocialLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 border border-gray-300 p-3 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+          >
+            <FaGoogle className="text-red-500 text-lg" />
+            <span className="text-sm">Sign in with Google</span>
+          </button>
+
+          <div className="my-4 flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex-grow border-t" /> OR <div className="flex-grow border-t" />
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="email"
@@ -161,19 +175,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="my-6 flex items-center gap-2 text-gray-400 text-sm">
-            <div className="flex-grow border-t" /> OR{" "}
-            <div className="flex-grow border-t" />
-          </div>
-
-          <button
-            onClick={handleSocialLogin}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 p-3 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed mb-4"
-          >
-            <FaGoogle className="text-red-500 text-lg" />
-            <span className="text-sm">Sign in with Google</span>
-          </button>
+          
 
           <p className="text-sm text-center mt-6 text-gray-500">
             New user?{" "}
