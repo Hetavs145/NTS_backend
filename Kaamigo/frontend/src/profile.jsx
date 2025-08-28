@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
+import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaCamera, FaEdit } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -14,7 +14,25 @@ const storage = getStorage(app);
 export default function Profile() {
   const [isBooked, setIsBooked] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
-  const [profile, setProfile] = useState({ name: "", address: "", phone: "", skills: "", projects: 0, rating: 0, reviews: 0, about: "", featuredReel: "" });
+  const [profile, setProfile] = useState({ 
+    name: "", 
+    address: "", 
+    phone: "", 
+    skills: "", 
+    projects: 0, 
+    rating: 0, 
+    reviews: 0, 
+    about: "", 
+    featuredReel: "",
+    userType: "freelancer", // freelancer or client
+    verification: {
+      govtId: false,
+      phone: false,
+      email: false,
+      address: false,
+      panSsn: false
+    }
+  });
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,6 +46,7 @@ export default function Profile() {
   const [testimonialEdit, setTestimonialEdit] = useState(false);
   const [testimonialForm, setTestimonialForm] = useState(profile.testimonials || []);
   const [testimonialSaving, setTestimonialSaving] = useState(false);
+  const [profilePicEdit, setProfilePicEdit] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -43,7 +62,18 @@ export default function Profile() {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setProfile(docSnap.data());
+          const data = docSnap.data();
+          setProfile({
+            ...data,
+            userType: data.userType || "freelancer",
+            verification: data.verification || {
+              govtId: false,
+              phone: false,
+              email: false,
+              address: false,
+              panSsn: false
+            }
+          });
         }
       } catch (err) {
         setError("Failed to fetch profile");
@@ -62,16 +92,32 @@ export default function Profile() {
 
   const handleBook = () => {
     setIsBooked(true);
-    alert("Session booked with Sarah!");
+    // Redirect to chatbot
+    window.location.href = '/explore?chat=true';
   };
 
   const handleMessage = () => {
     setMessageSent(true);
-    alert("Message sent to Sarah!");
+    // Redirect to chatbot
+    window.location.href = '/explore?chat=true';
   };
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
+  };
+
+  const handleUserTypeChange = (userType) => {
+    setProfile({ ...profile, userType });
+  };
+
+  const handleVerificationUpdate = (type, verified) => {
+    setProfile({
+      ...profile,
+      verification: {
+        ...profile.verification,
+        [type]: verified
+      }
+    });
   };
 
   const handleSave = async () => {
@@ -112,6 +158,28 @@ export default function Profile() {
       alert("Failed to upload reel");
     } finally {
       setAboutSaving(false);
+    }
+  };
+
+  const handleProfilePicUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+      
+      const storageRef = ref(storage, `profilePics/${user.uid}/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      
+      // Update profile with new profile picture URL
+      const updatedProfile = { ...profile, profilePic: url };
+      await setDoc(doc(db, "users", user.uid), updatedProfile);
+      setProfile(updatedProfile);
+      setProfilePicEdit(false);
+    } catch (err) {
+      alert("Failed to upload profile picture");
     }
   };
 
@@ -215,6 +283,34 @@ export default function Profile() {
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r shadow-xl p-6 space-y-6 rounded-r-xl">
         <h2 className="text-2xl font-extrabold text-purple-700 mb-6">📍 Kaamigo</h2>
+        
+        {/* User Type Switch */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Switch Profile Type</h3>
+          <div className="flex bg-gray-200 rounded-lg p-1">
+            <button
+              onClick={() => handleUserTypeChange('freelancer')}
+              className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+                profile.userType === 'freelancer'
+                  ? 'bg-white text-purple-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Freelancer
+            </button>
+            <button
+              onClick={() => handleUserTypeChange('client')}
+              className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+                profile.userType === 'client'
+                  ? 'bg-white text-purple-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Client
+            </button>
+          </div>
+        </div>
+
         <nav className="space-y-3">
           {[ 
             { label: "Explore", path: "/explore", icon: <LuLayoutDashboard /> },
@@ -248,11 +344,44 @@ export default function Profile() {
         {/* Sidebar Profile Card */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-10 rounded-lg shadow text-center">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlNt7Tl2jtLg7G15M-uMxtcPRwp6xW-xSJow&s"
-              alt="Profile"
-              className="w-24 h-24 mx-auto rounded-full mb-6 object-cover shadow-lg"
-            />
+            {/* Profile Picture Section */}
+            <div className="relative mb-6">
+              <img
+                src={profile.profilePic || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlNt7Tl2jtLg7G15M-uMxtcPRwp6xW-xSJow&s"}
+                alt="Profile"
+                className="w-24 h-24 mx-auto rounded-full object-cover shadow-lg"
+              />
+              <button
+                onClick={() => setProfilePicEdit(true)}
+                className="absolute bottom-0 right-0 bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition-colors"
+              >
+                <FaCamera className="text-sm" />
+              </button>
+            </div>
+
+            {/* Profile Picture Upload Modal */}
+            {profilePicEdit && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg max-w-sm w-full">
+                  <h3 className="text-lg font-semibold mb-4">Update Profile Picture</h3>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePicUpload}
+                    className="w-full mb-4"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setProfilePicEdit(false)}
+                      className="flex-1 px-4 py-2 border rounded hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <h2 className="font-bold text-lg p-1 text-orange-500">{profile.name || "Name"}</h2>
             <p className="text-sm text-gray-600 p-1">{profile.skills || "Skills"}</p>
             <div className="flex justify-center gap-5 mt-2 text-sm text-gray-500">
@@ -282,22 +411,86 @@ export default function Profile() {
             >
               {messageSent ? "Message Sent" : "Send Message"}
             </button>
-            <button
-              onClick={handleHire}
-              className="mt-2 bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition-colors"
-            >
-              Hire Freelancer
-            </button>
+            
+            {/* Show Hire button only for clients */}
+            {profile.userType === 'client' && (
+              <button
+                onClick={handleHire}
+                className="mt-2 bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition-colors"
+              >
+                Hire a Freelancer
+              </button>
+            )}
           </div>
 
           <div className="bg-white p-10 rounded-lg shadow">
             <h3 className="font-semibold mb-2">Verification Status</h3>
             <ul className="text-sm space-y-1 text-gray-600">
-              <li>✔️ Govt ID – Verified</li>
-              <li>✔️ Phone – Verified</li>
-              <li>✔️ Email – Verified</li>
-              <li>❌ Address – Not Verified</li>
-              <li>❌ PAN/SSN – Not Verified</li>
+              <li className="flex items-center justify-between">
+                <span>Govt ID</span>
+                <button
+                  onClick={() => handleVerificationUpdate('govtId', !profile.verification.govtId)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.govtId 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.govtId ? 'Verified' : 'Verify'}
+                </button>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Phone</span>
+                <button
+                  onClick={() => handleVerificationUpdate('phone', !profile.verification.phone)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.phone 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.phone ? 'Verified' : 'Verify'}
+                </button>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Email</span>
+                <button
+                  onClick={() => handleVerificationUpdate('email', !profile.verification.email)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.email 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.email ? 'Verified' : 'Verify'}
+                </button>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Address</span>
+                <button
+                  onClick={() => handleVerificationUpdate('address', !profile.verification.address)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.address 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.address ? 'Verified' : 'Verify'}
+                </button>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>PAN/SSN</span>
+                <button
+                  onClick={() => handleVerificationUpdate('panSsn', !profile.verification.panSsn)}
+                  className={`px-2 py-1 rounded text-xs ${
+                    profile.verification.panSsn 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {profile.verification.panSsn ? 'Verified' : 'Verify'}
+                </button>
+              </li>
             </ul>
           </div>
         </div>

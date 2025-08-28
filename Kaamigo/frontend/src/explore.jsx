@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
+import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaTimes, FaEye } from "react-icons/fa";
 import MapWithRadius from "./mapWithRedius";
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -19,6 +19,8 @@ export default function Explore() {
   const [remoteFreelancers, setRemoteFreelancers] = useState([]);
   const [featuredFreelancers, setFeaturedFreelancers] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [selectedFreelancer, setSelectedFreelancer] = useState(null);
+  const [showFreelancerModal, setShowFreelancerModal] = useState(false);
 
   // Initialize from query param
   useEffect(() => {
@@ -60,6 +62,11 @@ export default function Explore() {
             rating: typeof d.rating === "number" && d.rating > 0 ? d.rating : 4,
             price: typeof d.price === "number" ? d.price : 200,
             reviews: typeof d.reviews === "number" ? d.reviews : 0,
+            about: d.about || "Professional freelancer with expertise in their field.",
+            skills: d.skills || "General Skills",
+            portfolio: d.portfolio || [],
+            services: d.services || [],
+            profilePic: d.profilePic || null,
           };
         });
         if (users.length > 0) {
@@ -82,6 +89,11 @@ export default function Explore() {
             price: (i % 10) * 50,
             reviews: (i % 20) + 1,
             isPro: i < 3, // First 3 are featured
+            about: "Professional freelancer with expertise in their field.",
+            skills: ["Web Development", "UI/UX Design", "Content Writing", "Video Editing"][i % 4],
+            portfolio: [],
+            services: [],
+            profilePic: null,
             location: {
               lat: 28.7041 + (Math.random() - 0.5) * 0.1,
               lng: 77.1025 + (Math.random() - 0.5) * 0.1
@@ -104,6 +116,11 @@ export default function Explore() {
           price: (i % 10) * 50,
           reviews: (i % 20) + 1,
           isPro: i < 3,
+          about: "Professional freelancer with expertise in their field.",
+          skills: ["Web Development", "UI/UX Design", "Content Writing", "Video Editing"][i % 4],
+          portfolio: [],
+          services: [],
+          profilePic: null,
           location: {
             lat: 28.7041 + (Math.random() - 0.5) * 0.1,
             lng: 77.1025 + (Math.random() - 0.5) * 0.1
@@ -160,6 +177,22 @@ export default function Explore() {
     return R * c;
   };
 
+  const handleViewDetails = (freelancer) => {
+    setSelectedFreelancer(freelancer);
+    setShowFreelancerModal(true);
+  };
+
+  const closeFreelancerModal = () => {
+    setShowFreelancerModal(false);
+    setSelectedFreelancer(null);
+  };
+
+  const applyFilters = () => {
+    // Filters are already applied in real-time via useMemo
+    // This function can be used for additional filter logic if needed
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-purple-50 flex font-[Inter]">
       {/* Sidebar */}
@@ -205,7 +238,7 @@ export default function Explore() {
                 onChange={(e) => setQuery(e.target.value)}
               />
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
+                <button onClick={applyFilters} className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
                   Apply Filters
                 </button>
                 <button onClick={() => { setQuery(""); setCategory(""); setStatus(""); setLocation(""); setRating(1); setPrice(500); }} className="w-full border border-purple-600 text-purple-700 py-2 rounded hover:bg-purple-50 transition">
@@ -240,8 +273,9 @@ export default function Explore() {
                 <input value={rating} onChange={(e) => setRating(Number(e.target.value))} type="range" min="1" max="5" className="w-full accent-orange-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Price Range</label>
+                <label className="block text-sm font-medium mb-1">Price Range (₹)</label>
                 <input value={price} onChange={(e) => setPrice(Number(e.target.value))} type="range" min="0" max="500" className="w-full accent-orange-500" />
+                <div className="text-xs text-gray-500 mt-1">₹0 - ₹{price}</div>
               </div>
             </div>
 
@@ -257,10 +291,10 @@ export default function Explore() {
                     <p className="text-sm text-gray-500">{f.role}</p>
                     <p className="text-xs text-gray-400">⭐ {f.rating} • ₹{f.price}</p>
                     <button 
-                      onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} 
-                      className="text-sm text-purple-600 hover:underline"
+                      onClick={() => handleViewDetails(f)} 
+                      className="text-sm text-purple-600 hover:underline flex items-center gap-1"
                     >
-                      View Profile
+                      <FaEye className="text-xs" /> View Details
                     </button>
                   </div>
                 </div>
@@ -289,7 +323,7 @@ export default function Explore() {
 
         {/* Featured Freelancers */}
         <section className="mt-10">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers (Pro Subscribers)</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             {featuredFreelancers.map((f) => (
               <div key={f.id} className="bg-gradient-to-br from-purple-50 to-orange-50 border-2 border-purple-200 p-4 rounded-xl shadow-md relative">
@@ -302,8 +336,8 @@ export default function Explore() {
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
                 <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <button onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} className="text-xs text-purple-600 hover:underline">
-                  View Profile
+                <button onClick={() => handleViewDetails(f)} className="text-xs text-purple-600 hover:underline flex items-center gap-1 justify-center w-full mt-2">
+                  <FaEye className="text-xs" /> View Details
                 </button>
               </div>
             ))}
@@ -319,8 +353,8 @@ export default function Explore() {
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
                 <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <button onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} className="text-xs text-purple-600 hover:underline">
-                  View Profile
+                <button onClick={() => handleViewDetails(f)} className="text-xs text-purple-600 hover:underline flex items-center gap-1 justify-center w-full mt-2">
+                  <FaEye className="text-xs" /> View Details
                 </button>
               </div>
             ))}
@@ -330,13 +364,68 @@ export default function Explore() {
           </div>
         </section>
 
-        {/* Back to Top */}
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-4 right-4 bg-orange-600 text-white px-4 py-2 rounded-full shadow hover:bg-gradient-to-r from-orange-400 to-yellow-500 transition duration-300"
-        >
-          Go Back
-        </button>
+        {/* Freelancer Details Modal */}
+        {showFreelancerModal && selectedFreelancer && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-2xl font-bold text-purple-700">{selectedFreelancer.name}</h2>
+                  <button
+                    onClick={closeFreelancerModal}
+                    className="text-gray-500 hover:text-gray-700 text-xl"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Profile Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="font-medium">Role:</span> {selectedFreelancer.role}</p>
+                      <p><span className="font-medium">Category:</span> {selectedFreelancer.category}</p>
+                      <p><span className="font-medium">Location:</span> {selectedFreelancer.city}</p>
+                      <p><span className="font-medium">Status:</span> {selectedFreelancer.status}</p>
+                      <p><span className="font-medium">Rating:</span> ⭐ {selectedFreelancer.rating}/5</p>
+                      <p><span className="font-medium">Reviews:</span> {selectedFreelancer.reviews || 0}</p>
+                      <p><span className="font-medium">Rate:</span> ₹{selectedFreelancer.price}/hr</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">About</h3>
+                    <p className="text-sm text-gray-600">{selectedFreelancer.about}</p>
+                    
+                    <h3 className="font-semibold text-lg mb-2 mt-4">Skills</h3>
+                    <p className="text-sm text-gray-600">{selectedFreelancer.skills}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => {
+                      closeFreelancerModal();
+                      navigate('/explore?chat=true');
+                    }}
+                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+                  >
+                    Send Message
+                  </button>
+                  <button
+                    onClick={() => {
+                      closeFreelancerModal();
+                      navigate('/explore?chat=true');
+                    }}
+                    className="border border-purple-600 text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50 transition"
+                  >
+                    Book Session
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

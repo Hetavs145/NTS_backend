@@ -15,6 +15,18 @@ const ReelUpload = ({ onUploadSuccess }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const categories = [
+    "Design",
+    "Development", 
+    "Multimedia",
+    "Writing",
+    "Marketing",
+    "Admin Support",
+    "Consulting",
+    "Finance",
+    "Data Science"
+  ];
+
   const handleUpload = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -101,97 +113,177 @@ const ReelUpload = ({ onUploadSuccess }) => {
   };
 
   return (
-    <section className="space-y-4 bg-white p-7 rounded-xl shadow-lg border border-purple-100">
-      <h2 className="text-3xl font-bold text-purple-600">
-        ⭐ Upload Your Reel
-      </h2>
+    <section className="space-y-6 bg-white p-8 rounded-xl shadow-lg border-2 border-purple-200 hover:border-purple-300 transition-colors duration-300">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-purple-600 mb-2">
+          ⭐ Upload Your Reel
+        </h2>
+        <p className="text-gray-600">Share your skills and creativity with the Kaamigo community</p>
+      </div>
 
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-          <span className="block sm:inline">{successMessage}</span>
+        <div className="bg-green-100 border-2 border-green-400 text-green-700 px-6 py-4 rounded-lg relative mb-6 text-center">
+          <span className="block sm:inline font-semibold">{successMessage}</span>
         </div>
       )}
 
       <form
         ref={formRef}
         onSubmit={handleUpload}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm"
+        className="space-y-6"
       >
-        <input
-          required
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          disabled={isLoading}
-        />
-        <input
-          required
-          placeholder="Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          disabled={isLoading}
-        />
-        <input
-          required
-          placeholder="Tags (comma separated)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          disabled={isLoading}
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          disabled={isLoading}
-          className="col-span-2"
-        />
-        <label className={isLoading ? "opacity-50" : ""}>
-          Thumbnail:{" "}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Reel Title *
+            </label>
+            <input
+              required
+              placeholder="Enter an engaging title for your reel"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Category *
+            </label>
+            <select
+              required
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Tags
+          </label>
           <input
-            type="file"
-            accept="image/*"
-            required
-            onChange={(e) => setThumbnail(e.target.files[0])}
+            placeholder="Enter tags separated by commas (e.g., web design, UI, creative)"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
             disabled={isLoading}
+            className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           />
-        </label>
-        <label className={isLoading ? "opacity-50" : ""}>
-          Video:{" "}
-          <input
-            type="file"
-            accept="video/*"
+          <p className="text-xs text-gray-500">Tags help others discover your reel</p>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Description *
+          </label>
+          <textarea
             required
-            onChange={(e) => setVideo(e.target.files[0])}
+            placeholder="Describe your reel, what skills you're showcasing, or what viewers can learn"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             disabled={isLoading}
+            rows={4}
+            className="w-full px-4 py-3 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
           />
-        </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Thumbnail Image *
+            </label>
+            <div className="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:border-purple-300 transition-colors duration-200">
+              <input
+                type="file"
+                accept="image/*"
+                required
+                onChange={(e) => setThumbnail(e.target.files[0])}
+                disabled={isLoading}
+                className="hidden"
+                id="thumbnail-upload"
+              />
+              <label htmlFor="thumbnail-upload" className="cursor-pointer">
+                <div className="text-purple-500 mb-2">
+                  <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <p className="text-sm text-gray-600">
+                  {thumbnail ? thumbnail.name : "Click to upload thumbnail"}
+                </p>
+                {thumbnail && (
+                  <p className="text-xs text-purple-600 mt-1">✓ {thumbnail.name}</p>
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Video File *
+            </label>
+            <div className="border-2 border-dashed border-orange-200 rounded-lg p-6 text-center hover:border-orange-300 transition-colors duration-200">
+              <input
+                type="file"
+                accept="video/*"
+                required
+                onChange={(e) => setVideo(e.target.files[0])}
+                disabled={isLoading}
+                className="hidden"
+                id="video-upload"
+              />
+              <label htmlFor="video-upload" className="cursor-pointer">
+                <div className="text-orange-500 mb-2">
+                  <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <p className="text-sm text-gray-600">
+                  {video ? video.name : "Click to upload video"}
+                </p>
+                {video && (
+                  <p className="text-xs text-orange-600 mt-1">✓ {video.name}</p>
+                )}
+              </label>
+            </div>
+          </div>
+        </div>
 
         {isLoading && (
-          <div className="col-span-2 mb-3">
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="space-y-3">
+            <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-purple-600 h-2.5 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-purple-600 to-orange-500 h-3 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
-            <p className="text-xs text-center mt-1 text-gray-500">
-              {uploadProgress < 100 ? "Uploading..." : "Processing..."}
+            <p className="text-sm text-center text-gray-600 font-medium">
+              {uploadProgress < 100 ? "Uploading your reel..." : "Processing..."}
             </p>
           </div>
         )}
 
-        <button
-          className={`col-span-2 py-2 rounded ${
-            isLoading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-purple-600 hover:bg-purple-700 text-white"
-          }`}
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading ? "Uploading..." : "Upload"}
-        </button>
+        <div className="text-center">
+          <button
+            className={`px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white shadow-lg hover:shadow-xl"
+            }`}
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Uploading..." : "🚀 Upload Reel"}
+          </button>
+        </div>
       </form>
     </section>
   );

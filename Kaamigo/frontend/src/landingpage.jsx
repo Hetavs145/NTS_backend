@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link, NavLink } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 
 // Dynamic styling for active nav links
 const navLinkClass = ({ isActive }) =>
@@ -18,6 +18,7 @@ const navLinkClass = ({ isActive }) =>
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +30,14 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -39,9 +48,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex flex-wrap items-center justify-between px-6 md:px-8 py-4 md:py-6 border-b shadow-sm bg-indigo-50 transition-all duration-300">
+    <nav className={`flex flex-wrap items-center justify-between px-6 md:px-8 py-4 md:py-6 border-b shadow-sm transition-all duration-300 ${
+      darkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-indigo-50 text-gray-800 border-gray-200'
+    }`}>
       {/* Logo */}
-      <NavLink to="/" className="text-2xl md:text-3xl font-bold text-purple-700 hover:text-purple-800 transition-colors duration-300 cursor-pointer">
+      <NavLink to="/" className={`text-2xl md:text-3xl font-bold transition-colors duration-300 cursor-pointer ${
+        darkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-700 hover:text-purple-800'
+      }`}>
         Kaamigo
       </NavLink>
 
@@ -56,8 +69,20 @@ const Navbar = () => {
         <NavLink to="/blog" className={navLinkClass}>Blog</NavLink>
       </div>
 
-      {/* Auth Buttons */}
+      {/* Auth Buttons and Dark Mode Toggle */}
       <div className="flex items-center space-x-4 mt-4 md:mt-0">
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className={`p-2 rounded-lg transition-colors duration-300 ${
+            darkMode 
+              ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {darkMode ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+        </button>
+
         {!isSignedIn ? (
           <>
             <NavLink to="/login" className="text-base font-medium text-gray-700 hover:text-orange-500 transition-colors duration-300 py-2 px-4 rounded hover:bg-orange-50">
@@ -92,7 +117,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
-      <div className="bg-gradient-to-br from-orange-100 to-orange-50 py-24 md:py-32 text-center px-4 sm:px-6">
+      <div className="bg-gradient-to-br from-orange-100 via-purple-100 to-orange-50 py-24 md:py-32 text-center px-4 sm:px-6">
         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 animate-pulse">
           Reels Bhi. Rozgaar Bhi.
         </h1>
@@ -120,9 +145,14 @@ const LandingPage = () => {
           <button onClick={() => navigate('/coming-soon')} className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
             📥 Download the App
           </button>
-          <button onClick={() => navigate('/sign')} className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
-            Join as a Freelancer / Client
-          </button>
+          <div className="flex gap-4">
+            <button onClick={() => navigate('/sign?type=freelancer')} className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+              Join as a Freelancer
+            </button>
+            <button onClick={() => navigate('/sign?type=client')} className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+              Join as a Client
+            </button>
+          </div>
         </div>
       </div>
 

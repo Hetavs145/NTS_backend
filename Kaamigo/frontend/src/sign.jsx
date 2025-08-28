@@ -1,24 +1,36 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle, FaUserTie, FaBriefcase } from "react-icons/fa";
 
 export default function Signup() {
+  const { type } = useParams();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
+    userType: type || "freelancer",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (type) {
+      setFormData(prev => ({ ...prev, userType: type }));
+    }
+  }, [type]);
+
   const togglePassword = () => setShowPassword((prev) => !prev);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleUserTypeChange = (userType) => {
+    setFormData({ ...formData, userType });
   };
 
   const handleSocialClick = async () => {
@@ -76,12 +88,37 @@ export default function Signup() {
     }
   };
 
+  const getWelcomeMessage = () => {
+    if (type === "client") {
+      return {
+        title: "Hire Top Talent!",
+        subtitle: "Join as a client to find skilled freelancers for your projects",
+        icon: <FaBriefcase className="text-6xl mb-4" />
+      };
+    } else if (type === "freelancer") {
+      return {
+        title: "Showcase Your Skills!",
+        subtitle: "Join as a freelancer to find amazing opportunities",
+        icon: <FaUserTie className="text-6xl mb-4" />
+      };
+    } else {
+      return {
+        title: "Welcome to Kaamigo!",
+        subtitle: "Choose your path and start your journey",
+        icon: <div className="text-6xl mb-4">🚀</div>
+      };
+    }
+  };
+
+  const welcome = getWelcomeMessage();
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-orange-100 px-4">
       <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-bl from-purple-600 to-fuchsia-500 text-white flex flex-col justify-center items-center p-10">
-          <h2 className="text-4xl font-bold mb-4 text-center">Welcome again!</h2>
-          <p className="text-lg text-center">Sign up to start your journey with Kaamigos</p>
+          {welcome.icon}
+          <h2 className="text-4xl font-bold mb-4 text-center">{welcome.title}</h2>
+          <p className="text-lg text-center">{welcome.subtitle}</p>
         </div>
 
         <div className="p-10 flex flex-col justify-center">
@@ -91,6 +128,41 @@ export default function Signup() {
           </p>
 
           <h2 className="text-3xl font-bold text-orange-600 mb-6">Sign Up</h2>
+
+          {/* User Type Selection */}
+          {!type && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                I want to join as:
+              </label>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => handleUserTypeChange('freelancer')}
+                  className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                    formData.userType === 'freelancer'
+                      ? 'bg-white text-purple-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <FaUserTie className="inline mr-2" />
+                  Freelancer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleUserTypeChange('client')}
+                  className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                    formData.userType === 'client'
+                      ? 'bg-white text-purple-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <FaBriefcase className="inline mr-2" />
+                  Client
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3 mb-6">
             <button

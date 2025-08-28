@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaCoins, FaGift, FaHistory, FaTrophy, FaBookOpen, FaRobot, FaLink, FaUserPlus, FaComments } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCoins, FaGift, FaHistory, FaTrophy, FaBookOpen, FaRobot, FaLink, FaUserPlus, FaComments, FaExclamationTriangle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const tasks = [
@@ -41,40 +41,127 @@ const tasks = [
   },
 ];
 
-const transactions = [
-  { desc: 'Completed Daily Quiz', date: '2024-07-01', amount: '+15', type: 'pos' },
-  { desc: 'Purchased Premium Article Access', date: '2024-06-28', amount: '-120', type: 'neg' },
-  { desc: "Finished 'Introduction to React'", date: '2024-06-27', amount: '+80', type: 'pos' },
-  { desc: 'Logged in daily bonus', date: '2024-06-27', amount: '+10', type: 'pos' },
-  { desc: 'Unlocked Advanced Algorithms course', date: '2024-06-26', amount: '-250', type: 'neg' },
-];
-
-const leaderboard = [
-  { name: 'Alice Smith', coins: 8750 },
-  { name: 'Bob Johnson', coins: 7920 },
-  { name: 'Charlie Brown', coins: 7100 },
-  { name: 'Diana Prince', coins: 6540 },
-  { name: 'Eve Adams', coins: 5890 },
-  { name: 'Frank White', coins: 5310 },
-];
-
 const Coins = () => {
+  const [coins, setCoins] = useState(1573);
+  const [transactions, setTransactions] = useState([
+    { id: 1, desc: 'Completed Daily Quiz', date: '2024-07-01', amount: '+15', type: 'pos', timestamp: Date.now() - 1000 * 60 * 5 },
+    { id: 2, desc: 'Purchased Premium Article Access', date: '2024-06-28', amount: '-120', type: 'neg', timestamp: Date.now() - 1000 * 60 * 60 * 24 * 3 },
+    { id: 3, desc: "Finished 'Introduction to React'", date: '2024-06-27', amount: '+80', type: 'pos', timestamp: Date.now() - 1000 * 60 * 60 * 24 * 4 },
+    { id: 4, desc: 'Logged in daily bonus', date: '2024-06-27', amount: '+10', type: 'pos', timestamp: Date.now() - 1000 * 60 * 60 * 24 * 4 },
+    { id: 5, desc: 'Unlocked Advanced Algorithms course', date: '2024-06-26', amount: '-250', type: 'neg', timestamp: Date.now() - 1000 * 60 * 60 * 24 * 5 },
+  ]);
+  const [leaderboard, setLeaderboard] = useState([
+    { name: 'Alice Smith', coins: 8750, change: '+150' },
+    { name: 'Bob Johnson', coins: 7920, change: '+80' },
+    { name: 'Charlie Brown', coins: 7100, change: '+200' },
+    { name: 'Diana Prince', coins: 6540, change: '-50' },
+    { name: 'Eve Adams', coins: 5890, change: '+120' },
+    { name: 'Frank White', coins: 5310, change: '+90' },
+  ]);
+  const [lastUpdated, setLastUpdated] = useState('Just now');
+
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Update last updated time
+      setLastUpdated('Just now');
+      
+      // Simulate new transactions
+      const newTransaction = {
+        id: Date.now(),
+        desc: 'Daily Login Bonus',
+        date: new Date().toISOString().split('T')[0],
+        amount: '+5',
+        type: 'pos',
+        timestamp: Date.now()
+      };
+      
+      setTransactions(prev => [newTransaction, ...prev.slice(0, 4)]);
+      
+      // Update coins
+      setCoins(prev => prev + 5);
+      
+      // Update leaderboard
+      setLeaderboard(prev => prev.map(user => ({
+        ...user,
+        coins: user.coins + Math.floor(Math.random() * 10),
+        change: `+${Math.floor(Math.random() * 50)}`
+      })));
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDailyBonus = () => {
+    const bonus = 50;
+    setCoins(prev => prev + bonus);
+    
+    const newTransaction = {
+      id: Date.now(),
+      desc: 'Daily Bonus Collected',
+      date: new Date().toISOString().split('T')[0],
+      amount: `+${bonus}`,
+      type: 'pos',
+      timestamp: Date.now()
+    };
+    
+    setTransactions(prev => [newTransaction, ...prev.slice(0, 4)]);
+    setLastUpdated('Just now');
+    
+    alert(`Daily bonus collected! +${bonus} coins. Total: ${coins + bonus} coins`);
+  };
+
+  const handleTaskComplete = (taskTitle, taskCoins) => {
+    setCoins(prev => prev + taskCoins);
+    
+    const newTransaction = {
+      id: Date.now(),
+      desc: `Task Completed: ${taskTitle}`,
+      date: new Date().toISOString().split('T')[0],
+      amount: `+${taskCoins}`,
+      type: 'pos',
+      timestamp: Date.now()
+    };
+    
+    setTransactions(prev => [newTransaction, ...prev.slice(0, 4)]);
+    setLastUpdated('Just now');
+    
+    alert(`Task "${taskTitle}" completed! +${taskCoins} coins earned.`);
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return `${Math.floor(diff / 86400000)}d ago`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 text-gray-800">
+      {/* Coming Soon Banner */}
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 px-6 text-center">
+        <div className="flex items-center justify-center gap-2 text-lg font-semibold">
+          <FaExclamationTriangle className="text-xl" />
+          🪙 Coin Redemption Coming Soon! 🪙
+        </div>
+        <p className="text-sm mt-1 opacity-90">
+          We're working hard to bring you the ability to redeem your coins for rewards. Stay tuned!
+        </p>
+      </div>
+
       <div className="max-w-7xl mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row gap-8 mb-8">
           <div className="flex-1 flex flex-col sm:flex-row items-center bg-gradient-to-r from-purple-200 via-white to-orange-200 rounded-2xl shadow-xl p-6 md:p-8 border border-purple-100 gap-4">
             <div className="text-6xl text-orange-400"><FaCoins title="Your Coins" /></div>
             <div className="text-center sm:text-left">
-              <div className="text-5xl font-extrabold text-purple-700 mb-1 drop-shadow">1573</div>
-              <div className="text-gray-500 text-sm">Last updated: Just now</div>
+              <div className="text-5xl font-extrabold text-purple-700 mb-1 drop-shadow">{coins}</div>
+              <div className="text-gray-500 text-sm">Last updated: {lastUpdated}</div>
             </div>
             <button 
-              onClick={() => {
-                const newCoins = 1573 + 50;
-                alert(`Daily bonus collected! +50 coins. Total: ${newCoins} coins`);
-                // In a real app, this would update the database
-              }}
+              onClick={handleDailyBonus}
               className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold text-lg flex items-center justify-center gap-2"
             >
               <FaGift className="text-xl" />Collect Daily Bonus
@@ -85,11 +172,11 @@ const Coins = () => {
               <FaHistory className="text-orange-400" />Recent Transactions
             </div>
             <ul className="space-y-2">
-              {transactions.map((t, i) => (
-                <li key={i} className="flex justify-between items-center text-sm">
+              {transactions.map((t) => (
+                <li key={t.id} className="flex justify-between items-center text-sm">
                   <div>
                     <div className={t.type === 'pos' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>{t.desc}</div>
-                    <div className="text-gray-400 text-xs">{t.date}</div>
+                    <div className="text-gray-400 text-xs">{formatTimeAgo(t.timestamp)}</div>
                   </div>
                   <div className={t.type === 'pos' ? 'text-green-600' : 'text-red-600'}>{t.amount}</div>
                 </li>
@@ -116,10 +203,7 @@ const Coins = () => {
                   <div className="flex items-center justify-between mt-2">
                     <div className="text-orange-500 font-bold flex items-center"><span className="mr-1">🪙</span>{task.coins} Coins</div>
                     <button 
-                      onClick={() => {
-                        alert(`Task "${task.title}" completed! +${task.coins} coins earned.`);
-                        // In a real app, this would update the database and mark task as completed
-                      }}
+                      onClick={() => handleTaskComplete(task.title, task.coins)}
                       className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold"
                     >
                       Complete Task
@@ -137,10 +221,18 @@ const Coins = () => {
               {leaderboard.map((user, i) => (
                 <li key={i} className="flex justify-between items-center">
                   <span className="font-medium">{user.name}</span>
-                  <span className="text-purple-600 font-bold flex items-center"><span className="mr-1">🪙</span>{user.coins}</span>
+                  <div className="text-right">
+                    <div className="text-purple-600 font-bold flex items-center"><span className="mr-1">🪙</span>{user.coins}</div>
+                    <div className={`text-xs ${user.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                      {user.change}
+                    </div>
+                  </div>
                 </li>
               ))}
             </ol>
+            <div className="text-xs text-gray-500 mt-3 text-center">
+              Updates every 30 seconds
+            </div>
           </div>
         </div>
       </div>
