@@ -23,6 +23,7 @@ import FeatureBtn from "./premium.jsx";
 import PersonalDetails from "./personalDetails.jsx";
 import Footer from "./components/Footer.jsx";
 import ComingSoon from "./pages/ComingSoon.jsx";
+import Chatbot from "./components/Chatbot.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -48,6 +49,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/coming-soon" element={<ComingSoon/>} />
       </Routes>
       <Footer />
+      <Chatbot />
     </BrowserRouter>
   </StrictMode>
 );

@@ -30,6 +30,61 @@ const faqs = [
 
 const ContactUs = () => {
   const [openFaq, setOpenFaq] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      // In a real app, this would send the data to a backend API
+      // For now, we'll simulate sending to support@kaamigo.com
+      const emailData = {
+        to: 'support@kaamigo.com',
+        from: formData.email,
+        subject: `Contact Form: ${formData.subject}`,
+        body: `
+          Name: ${formData.name}
+          Email: ${formData.email}
+          Subject: ${formData.subject}
+          Message: ${formData.message}
+        `
+      };
+
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setSubmitStatus({
+        success: true,
+        message: 'Message sent successfully! We\'ll get back to you soon.'
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+
+    } catch (error) {
+      setSubmitStatus({
+        success: false,
+        message: 'Failed to send message. Please try again or email us directly at support@kaamigo.com'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fdf6f6] text-gray-800 px-4">
       <div className="w-full bg-gradient-to-r from-purple-700 via-purple-500 to-orange-500 py-20 text-center rounded-b-3xl">
@@ -40,14 +95,61 @@ const ContactUs = () => {
       <div className="max-w-7xl mx-auto mt-16 flex flex-col lg:flex-row gap-8">
         <div className="flex-1 bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-purple-100">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-purple-700"><FaEnvelope />Send Us a Message</h2>
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
-              <input type="text" placeholder="Your Name" className="flex-1 px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" />
-              <input type="email" placeholder="Your Email" className="flex-1 px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" />
+              <input 
+                type="text" 
+                placeholder="Your Name" 
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                required
+                className="flex-1 px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" 
+              />
+              <input 
+                type="email" 
+                placeholder="Your Email" 
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+                className="flex-1 px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" 
+              />
             </div>
-            <input type="text" placeholder="Subject" className="w-full px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" />
-            <textarea rows="4" placeholder="Your Message" className="w-full px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none"></textarea>
-            <button type="submit" className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-orange-500 hover:scale-105 transition-all duration-300">Send Message</button>
+            <input 
+              type="text" 
+              placeholder="Subject" 
+              value={formData.subject}
+              onChange={(e) => setFormData({...formData, subject: e.target.value})}
+              required
+              className="w-full px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none" 
+            />
+            <textarea 
+              rows="4" 
+              placeholder="Your Message" 
+              value={formData.message}
+              onChange={(e) => setFormData({...formData, message: e.target.value})}
+              required
+              className="w-full px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none"
+            ></textarea>
+            
+            {submitStatus && (
+              <div className={`p-3 rounded-lg text-sm ${
+                submitStatus.success 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-red-100 text-red-700 border border-red-200'
+              }`}>
+                {submitStatus.message}
+              </div>
+            )}
+            
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className={`w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-orange-500 hover:scale-105 transition-all duration-300 ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+            </button>
           </form>
         </div>
 

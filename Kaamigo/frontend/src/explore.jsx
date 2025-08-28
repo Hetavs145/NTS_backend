@@ -17,12 +17,31 @@ export default function Explore() {
   const [price, setPrice] = useState(500);
 
   const [remoteFreelancers, setRemoteFreelancers] = useState([]);
+  const [featuredFreelancers, setFeaturedFreelancers] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
 
   // Initialize from query param
   useEffect(() => {
     const params = new URLSearchParams(locationHook.search);
     const qParam = params.get("q") || "";
     if (qParam) setQuery(qParam);
+    
+    // Get user location for nearby calculations
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log("Location access denied:", error);
+          // Default to Delhi coordinates
+          setUserLocation({ lat: 28.7041, lng: 77.1025 });
+        }
+      );
+    }
   }, [locationHook.search]);
 
   useEffect(() => {
@@ -44,28 +63,16 @@ export default function Explore() {
           };
         });
         if (users.length > 0) {
-          setRemoteFreelancers(users);
+          // Separate featured and regular freelancers
+          const featured = users.filter(user => user.isPro || user.subscription === 'pro');
+          const regular = users.filter(user => !user.isPro && user.subscription !== 'pro');
+          
+          setFeaturedFreelancers(featured);
+          setRemoteFreelancers(regular);
         } else {
           // Fallback demo data for empty DB
-          setRemoteFreelancers(
-            Array.from({ length: 12 }).map((_, i) => ({
-              id: `demo-${i}`,
-              name: `Freelancer #${i + 1}`,
-              role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
-              category: ["Tech", "Design", "Content", "Media"][i % 4],
-              status: ["Available", "Busy"][i % 2],
-              city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
-              rating: (i % 5) + 1,
-              price: (i % 10) * 50,
-              reviews: (i % 20) + 1,
-            }))
-          );
-        }
-      } catch (e) {
-        // Network/permission error fallback
-        setRemoteFreelancers(
-          Array.from({ length: 12 }).map((_, i) => ({
-            id: `offline-${i}`,
+          const demoUsers = Array.from({ length: 12 }).map((_, i) => ({
+            id: `demo-${i}`,
             name: `Freelancer #${i + 1}`,
             role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
             category: ["Tech", "Design", "Content", "Media"][i % 4],
@@ -74,15 +81,45 @@ export default function Explore() {
             rating: (i % 5) + 1,
             price: (i % 10) * 50,
             reviews: (i % 20) + 1,
-          }))
-        );
+            isPro: i < 3, // First 3 are featured
+            location: {
+              lat: 28.7041 + (Math.random() - 0.5) * 0.1,
+              lng: 77.1025 + (Math.random() - 0.5) * 0.1
+            }
+          }));
+          
+          setFeaturedFreelancers(demoUsers.filter(u => u.isPro));
+          setRemoteFreelancers(demoUsers.filter(u => !u.isPro));
+        }
+      } catch (e) {
+        // Network/permission error fallback
+        const offlineUsers = Array.from({ length: 12 }).map((_, i) => ({
+          id: `offline-${i}`,
+          name: `Freelancer #${i + 1}`,
+          role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
+          category: ["Tech", "Design", "Content", "Media"][i % 4],
+          status: ["Available", "Busy"][i % 2],
+          city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
+          rating: (i % 5) + 1,
+          price: (i % 10) * 50,
+          reviews: (i % 20) + 1,
+          isPro: i < 3,
+          location: {
+            lat: 28.7041 + (Math.random() - 0.5) * 0.1,
+            lng: 77.1025 + (Math.random() - 0.5) * 0.1
+          }
+        }));
+        
+        setFeaturedFreelancers(offlineUsers.filter(u => u.isPro));
+        setRemoteFreelancers(offlineUsers.filter(u => !u.isPro));
       }
     };
     fetchUsers();
   }, []);
 
   const filtered = useMemo(() => {
-    return remoteFreelancers.filter((f) => {
+    const allFreelancers = [...featuredFreelancers, ...remoteFreelancers];
+    return allFreelancers.filter((f) => {
       const matchesQuery = query.trim().length === 0 ||
         f.name.toLowerCase().includes(query.toLowerCase()) ||
         f.role.toLowerCase().includes(query.toLowerCase());
@@ -93,7 +130,35 @@ export default function Explore() {
       const matchesPrice = f.price <= price;
       return matchesQuery && matchesCategory && matchesStatus && matchesLocation && matchesRating && matchesPrice;
     });
-  }, [remoteFreelancers, query, category, status, location, rating, price]);
+  }, [featuredFreelancers, remoteFreelancers, query, category, status, location, rating, price]);
+
+  // Calculate nearby freelancers (within 10km)
+  const nearbyFreelancers = useMemo(() => {
+    if (!userLocation) return [];
+    
+    const allFreelancers = [...featuredFreelancers, ...remoteFreelancers];
+    return allFreelancers.filter(f => {
+      if (!f.location) return false;
+      const distance = calculateDistance(
+        userLocation.lat, userLocation.lng,
+        f.location.lat, f.location.lng
+      );
+      return distance <= 10; // 10km radius
+    });
+  }, [featuredFreelancers, remoteFreelancers, userLocation]);
+
+  // Haversine formula to calculate distance between two points
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-purple-50 flex font-[Inter]">
@@ -181,28 +246,37 @@ export default function Explore() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">Nearby Freelancers</h2>
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gray-300 rounded-full mr-3" />
+              <h2 className="text-lg font-semibold text-gray-700 mb-4">Nearby Freelancers (10km)</h2>
+              {nearbyFreelancers.slice(0, 5).map((f, i) => (
+                <div key={f.id} className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-orange-400 rounded-full mr-3 flex items-center justify-center text-white font-bold text-lg">
+                    {f.name.charAt(0)}
+                  </div>
                   <div>
-                    <p className="font-semibold text-sm">Name #{i + 1}</p>
-                    <p className="text-sm text-gray-500">Web Designer</p>
-                    <a href="#" className="text-sm text-purple-600 hover:underline">
+                    <p className="font-semibold text-sm">{f.name}</p>
+                    <p className="text-sm text-gray-500">{f.role}</p>
+                    <p className="text-xs text-gray-400">⭐ {f.rating} • ₹{f.price}</p>
+                    <button 
+                      onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} 
+                      className="text-sm text-purple-600 hover:underline"
+                    >
                       View Profile
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
+              {nearbyFreelancers.length === 0 && (
+                <p className="text-sm text-gray-500 text-center">No nearby freelancers found</p>
+              )}
             </div>
           </aside>
 
           {/* Map Section */}
           <section className="lg:col-span-2 space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 text-center mb-4">Freelancers Around You (5km)</h2>
+              <h2 className="text-xl font-bold text-gray-800 text-center mb-4">Freelancers Around You (10km)</h2>
               <div className="h-[400px] rounded-lg overflow-hidden">
-                <MapWithRadius />
+                <MapWithRadius freelancers={nearbyFreelancers} userLocation={userLocation} />
               </div>
               <div className="text-center mt-4">
                 <button onClick={() => navigate('/explore')} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
@@ -215,11 +289,16 @@ export default function Explore() {
 
         {/* Featured Freelancers */}
         <section className="mt-10">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers Nearby</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filtered.map((f) => (
-              <div key={f.id} className="bg-white p-4 rounded-xl shadow-md">
-                <div className="h-24 bg-gray-200 rounded mb-2" />
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers (Pro Subscribers)</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+            {featuredFreelancers.map((f) => (
+              <div key={f.id} className="bg-gradient-to-br from-purple-50 to-orange-50 border-2 border-purple-200 p-4 rounded-xl shadow-md relative">
+                <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                  PRO
+                </div>
+                <div className="h-24 bg-gradient-to-br from-purple-400 to-orange-400 rounded mb-2 flex items-center justify-center text-white font-bold text-2xl">
+                  {f.name.charAt(0)}
+                </div>
                 <p className="font-semibold text-sm">{f.name}</p>
                 <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
                 <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
@@ -228,7 +307,24 @@ export default function Explore() {
                 </button>
               </div>
             ))}
-            {filtered.length === 0 && (
+          </div>
+          
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">All Freelancers</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filtered.filter(f => !f.isPro).map((f) => (
+              <div key={f.id} className="bg-white p-4 rounded-xl shadow-md">
+                <div className="h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded mb-2 flex items-center justify-center text-gray-600 font-bold text-2xl">
+                  {f.name.charAt(0)}
+                </div>
+                <p className="font-semibold text-sm">{f.name}</p>
+                <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
+                <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
+                <button onClick={() => navigate(`/explore/profile?uid=${encodeURIComponent(f.id)}`)} className="text-xs text-purple-600 hover:underline">
+                  View Profile
+                </button>
+              </div>
+            ))}
+            {filtered.filter(f => !f.isPro).length === 0 && (
               <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</div>
             )}
           </div>

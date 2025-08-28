@@ -167,6 +167,20 @@ export default function Profile() {
   const handleTestimonialChange = (idx, field, value) => {
     setTestimonialForm((prev) => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item));
   };
+
+  const handleServiceChange = (index, field, value) => {
+    const newServices = [...(profile.services || [])];
+    if (!newServices[index]) {
+      newServices[index] = { title: "", description: "" };
+    }
+    newServices[index] = { ...newServices[index], [field]: value };
+    setProfile({ ...profile, services: newServices });
+  };
+
+  const handleHire = () => {
+    // Redirect to jobs page for hiring
+    window.location.href = '/explore/jobs';
+  };
   const handleAddTestimonial = () => {
     setTestimonialForm((prev) => [...prev, { name: '', text: '', date: '' }]);
   };
@@ -268,6 +282,12 @@ export default function Profile() {
             >
               {messageSent ? "Message Sent" : "Send Message"}
             </button>
+            <button
+              onClick={handleHire}
+              className="mt-2 bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition-colors"
+            >
+              Hire Freelancer
+            </button>
           </div>
 
           <div className="bg-white p-10 rounded-lg shadow">
@@ -351,14 +371,45 @@ export default function Profile() {
 
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="font-bold mb-4 text-lg">My Services</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 text-sm">
-              {["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"].map(title => (
-                <div key={title} className="border p-6 rounded-lg text-center bg-white shadow">
-                  <h4 className="font-semibold text-sm mb-1">{title}</h4>
-                  <p className="text-xs text-gray-600">Detailed service description goes here.</p>
+            {edit ? (
+              <div className="space-y-3">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                  {["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"].map((title, index) => (
+                    <div key={title} className="border p-4 rounded-lg">
+                      <input 
+                        value={profile.services?.[index]?.title || title} 
+                        onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
+                        className="w-full p-2 border rounded mb-2 font-semibold text-sm"
+                        placeholder="Service Title"
+                      />
+                      <textarea 
+                        value={profile.services?.[index]?.description || "Detailed service description goes here."} 
+                        onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
+                        className="w-full p-2 border rounded text-xs text-gray-600"
+                        placeholder="Service Description"
+                        rows="3"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+                <button onClick={handleSave} disabled={saving} className="bg-purple-500 text-white px-4 py-2 rounded">
+                  {saving ? "Saving..." : "Save Services"}
+                </button>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 text-sm">
+                {(profile.services || ["Logo Design & Branding", "UI/UX Design", "Marketing Collateral", "Illustration & Iconography"]).map((service, index) => (
+                  <div key={index} className="border p-6 rounded-lg text-center bg-white shadow">
+                    <h4 className="font-semibold text-sm mb-1">
+                      {typeof service === 'string' ? service : service.title || `Service ${index + 1}`}
+                    </h4>
+                    <p className="text-xs text-gray-600">
+                      {typeof service === 'string' ? "Detailed service description goes here." : service.description || "Detailed service description goes here."}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">

@@ -207,10 +207,98 @@ const Reels = () => {
           </div>
         </section>
 
-        {/* Trending Freelancers */}
+        {/* Featured Reels */}
+        <section className="space-y-4 bg-white p-7 rounded-xl shadow-lg border border-purple-100">
+          <h2 className="text-3xl font-bold text-purple-600">
+            🎥 Featured Reels
+          </h2>
+          <div className={styles.reelsGrid}>
+            {reels
+              .filter(
+                (r) =>
+                  selectedCategory === "All" || r.category === selectedCategory
+              )
+              .slice(0, 6) // Show only first 6 featured reels
+              .map((reel, index) => (
+                <div
+                  key={reel.id}
+                  onClick={() => openReelModal(index)}
+                  className={styles.reelCard}
+                >
+                  {/* Thumbnail */}
+                  {reel.thumbnail_url ? (
+                    <img
+                      src={reel.thumbnail_url}
+                      alt={reel.title || "Reel"}
+                      className={styles.reelThumbnail}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          "https://via.placeholder.com/400x700?text=Thumbnail+Error";
+                      }}
+                    />
+                  ) : (
+                    <div className={styles.fallbackContainer}>
+                      <span className="text-gray-500 text-sm">
+                        No Thumbnail
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Play icon overlay */}
+                  <div className={styles.playOverlay}>
+                    <div className={styles.playButton}>
+                      <FaPlay className="text-white text-2xl" />
+                    </div>
+                  </div>
+
+                  {/* Bottom gradient overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black to-transparent opacity-80"></div>
+
+                  {/* Video info overlay at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white z-10">
+                    <h3 className="font-medium text-sm truncate">
+                      {reel.title || "Untitled Reel"}
+                    </h3>
+
+                    {/* User info */}
+                    <div className="flex items-center gap-2 mt-1">
+                      {userProfiles[reel.user_id]?.photoURL ? (
+                        <img
+                          src={userProfiles[reel.user_id]?.photoURL}
+                          alt={
+                            userProfiles[reel.user_id]?.displayName || "User"
+                          }
+                          className="w-5 h-5 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              userProfiles[reel.user_id]?.displayName || "User"
+                            )}&size=40&background=8B5CF6&color=fff`;
+                          }}
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-orange-400 flex items-center justify-center text-white text-xs font-bold">
+                          {userProfiles[reel.user_id]?.displayName?.charAt(0) || "U"}
+                        </div>
+                      )}
+                      <span className="text-xs opacity-90">
+                        {userProfiles[reel.user_id]?.displayName || "User"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+
+        {/* Upload Reels */}
+        <ReelUpload onUploadSuccess={fetchReels} />
+
+        {/* Featured Freelancers (Nearby) */}
         <section className="bg-white p-7 rounded-xl shadow-lg border border-purple-100 space-y-4">
           <h2 className="text-3xl font-bold text-orange-500">
-            🔥 Trending Freelancers
+            🌟 Featured Freelancers Nearby (10km)
           </h2>
           <div className="relative">
             <div className="flex gap-6 overflow-x-auto px-2 pb-2 scrollbar-thin scrollbar-thumb-purple-400">
@@ -221,22 +309,25 @@ const Reels = () => {
                     key={i}
                     className="text-center space-y-2 min-w-[120px] shadow rounded-lg p-4 bg-gradient-to-br from-white to-gray-50 border border-purple-100 hover:shadow-xl transition"
                   >
-                    <div className="w-16 h-16 mx-auto bg-gray-300 rounded-full shadow-inner" />
+                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-orange-400 rounded-full shadow-inner flex items-center justify-center text-white font-bold text-lg">
+                      {String.fromCharCode(65 + i)}
+                    </div>
                     <p className="font-medium text-sm">Freelancer #{i + 1}</p>
-                    <p className="text-xs text-gray-500">Role</p>
+                    <p className="text-xs text-gray-500">Web Developer</p>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-yellow-500">⭐</span>
+                      <span className="text-xs text-gray-600">4.{i + 2}</span>
+                    </div>
                   </div>
                 ))}
             </div>
           </div>
         </section>
 
-        {/* Featured Reels */}
-        <ReelUpload onUploadSuccess={fetchReels} />
-
-        {/* YouTube Shorts Style Grid */}
+        {/* All Reels Grid */}
         <section className="space-y-4 bg-white p-7 rounded-xl shadow-lg border border-purple-100">
           <h2 className="text-3xl font-bold text-purple-600">
-            🎥 Featured Reels
+            🎥 All Reels
           </h2>
           <div className={styles.reelsGrid}>
             {reels

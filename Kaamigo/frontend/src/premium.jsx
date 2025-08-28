@@ -5,7 +5,7 @@ import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "
 import { NavLink } from "react-router-dom";
 
 export default function FeatureBtn() {
-  const [selectedPlan, setSelectedPlan] = useState("free");
+  const [selectedPlan, setSelectedPlan] = useState("basic");
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
@@ -73,18 +73,18 @@ export default function FeatureBtn() {
             Choose Your Perfect Plan
           </h2>
           <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Free Plan */}
-            <div className={`bg-white border p-6 rounded-lg shadow ${selectedPlan === "free" ? "border-purple-500 bg-purple-50" : ""}`}>
-              <h3 className="text-xl font-bold mb-2">Free Plan</h3>
-              <p className="text-2xl font-bold mb-4">$0 <span className="text-sm font-normal">/month</span></p>
+            {/* Basic Plan */}
+            <div className={`bg-white border p-6 rounded-lg shadow ${selectedPlan === "basic" ? "border-purple-500 bg-purple-50" : ""}`}>
+              <h3 className="text-xl font-bold mb-2">Kaamigo Basic</h3>
+              <p className="text-2xl font-bold mb-4">₹0 <span className="text-sm font-normal">/month</span></p>
               <ul className="space-y-2 mb-6 text-sm">
-                {["Up to 5 Projects", "Basic Analytics", "Custom Support", "Priority Support", "Advanced Collaboration", "Custom Integrations", "Dedicated Account Manager"].map((item, idx) => (
+                {["Up to 5 Projects", "Basic Analytics", "Standard Support", "Basic Profile", "Limited Reels Upload", "Basic Job Applications"].map((item, idx) => (
                   <li key={idx}>✔ {item}</li>
                 ))}
               </ul>
               <button
                 className="w-full border border-purple-500 text-purple-500 py-2 rounded hover:bg-purple-100"
-                onClick={() => setSelectedPlan("free")}
+                onClick={() => setSelectedPlan("basic")}
               >
                 Start for Free
               </button>
@@ -96,7 +96,8 @@ export default function FeatureBtn() {
                 Recommended
               </span>
               <h3 className="text-xl font-bold mb-2">Kaamigo Pro</h3>
-              <p className="text-2xl font-bold mb-4">$19 <span className="text-sm font-normal">/month</span></p>
+              <p className="text-2xl font-bold mb-4">₹1000 <span className="text-sm font-normal">/month</span></p>
+              <p className="text-lg font-semibold text-purple-600 mb-2">₹800/month when billed annually</p>
               <ul className="space-y-2 mb-6 text-sm">
                 {["Unlimited Projects", "Advanced Analytics", "Advanced Collaboration", "Custom Integrations", "Dedicated Account Manager"].map((item, idx) => (
                   <li key={idx}>✔ {item}</li>

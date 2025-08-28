@@ -57,6 +57,13 @@ export default function Jobs() {
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [budgetFilter, setBudgetFilter] = useState("");
+  const [budgetRanges] = useState([
+    { label: "₹1K - ₹5K", value: "1000-5000" },
+    { label: "₹5K - ₹10K", value: "5000-10000" },
+    { label: "₹10K - ₹25K", value: "10000-25000" },
+    { label: "₹25K - ₹50K", value: "25000-50000" },
+    { label: "₹50K+", value: "50000-1000000" }
+  ]);
   const [jobTypeFilter, setJobTypeFilter] = useState("");
 
   const handleTextSearch = (e) => setQuery(e.target.value);
@@ -189,9 +196,11 @@ export default function Jobs() {
               onChange={(e) => setBudgetFilter(e.target.value)}
             >
               <option value="">Budget</option>
-              <option value="0-100">0–100</option>
-              <option value="101-500">101–500</option>
-              <option value="501-1000">501–1000</option>
+              {budgetRanges.map((range) => (
+                <option key={range.value} value={range.value}>
+                  {range.label}
+                </option>
+              ))}
             </select>
 
             <select
@@ -218,7 +227,7 @@ export default function Jobs() {
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-lg">{gig.title}</h3>
                   <p className="text-purple-600 font-bold">
-                    ${gig.budgetMin} – ${gig.budgetMax}
+                    ₹{gig.budgetMin} – ₹{gig.budgetMax}
                   </p>
                 </div>
                 <p className="text-sm text-orange-500">{gig.jobType}</p>

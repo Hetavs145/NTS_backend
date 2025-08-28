@@ -69,7 +69,14 @@ const Coins = () => {
               <div className="text-5xl font-extrabold text-purple-700 mb-1 drop-shadow">1573</div>
               <div className="text-gray-500 text-sm">Last updated: Just now</div>
             </div>
-            <button className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold text-lg flex items-center justify-center gap-2">
+            <button 
+              onClick={() => {
+                const newCoins = 1573 + 50;
+                alert(`Daily bonus collected! +50 coins. Total: ${newCoins} coins`);
+                // In a real app, this would update the database
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold text-lg flex items-center justify-center gap-2"
+            >
               <FaGift className="text-xl" />Collect Daily Bonus
             </button>
           </div>
@@ -108,7 +115,15 @@ const Coins = () => {
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <div className="text-orange-500 font-bold flex items-center"><span className="mr-1">🪙</span>{task.coins} Coins</div>
-                    <button className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold">Start Task</button>
+                    <button 
+                      onClick={() => {
+                        alert(`Task "${task.title}" completed! +${task.coins} coins earned.`);
+                        // In a real app, this would update the database and mark task as completed
+                      }}
+                      className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold"
+                    >
+                      Complete Task
+                    </button>
                   </div>
                 </div>
               ))}

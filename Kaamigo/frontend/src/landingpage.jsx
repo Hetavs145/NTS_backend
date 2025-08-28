@@ -254,8 +254,8 @@ const LandingPage = () => {
               <button onClick={() => navigate('/coming-soon')} className="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
                 📱 Download on Android
               </button>
-              <button className="border-2 border-purple-400 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg">
-                🍏 Get on iOS (Coming Soon)
+              <button onClick={() => navigate('/coming-soon')} className="border-2 border-purple-400 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg">
+                🍏 Get on iOS
               </button>
             </div>
           </div>
