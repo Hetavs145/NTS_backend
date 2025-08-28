@@ -1,7 +1,6 @@
 // LandingPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import { FiLogOut } from 'react-icons/fi';
@@ -88,6 +87,15 @@ const Navbar = () => {
 // Landing Page
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const onSearch = () => {
+    const q = search.trim();
+    if (q.length > 0) {
+      navigate(`/explore?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/explore');
+    }
+  };
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
@@ -105,8 +113,11 @@ const LandingPage = () => {
             type="text"
             placeholder="Search for gigs or workers..."
             className="w-full px-6 py-4 border-2 border-purple-200 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none focus:outline-none focus:border-purple-500 transition-colors duration-300 text-lg"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onSearch()}
           />
-          <button className="bg-purple-600 text-white px-8 py-4 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <button onClick={onSearch} className="bg-purple-600 text-white px-8 py-4 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
             Search
           </button>
         </div>
