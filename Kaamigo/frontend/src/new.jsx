@@ -110,7 +110,7 @@ const LandingPage = () => {
 
         {/* Call-to-action Buttons */}
         <div className="flex justify-center flex-wrap gap-4">
-          <button className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
+          <button onClick={() => navigate('/coming-soon')} className="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
             📥 Download the App
           </button>
           <button className="border-2 border-purple-600 text-purple-700 px-8 py-4 rounded-lg hover:bg-purple-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">

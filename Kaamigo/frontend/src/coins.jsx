@@ -130,21 +130,7 @@ const Coins = () => {
         </div>
       </div>
 
-      <footer className="bg-[#181B23] py-10 text-center text-gray-300 mt-16 px-4">
-        <div className="mb-4 flex flex-wrap justify-center gap-3 text-sm">
-          <span className="font-semibold text-purple-300">Our Pages:</span>
-          <Link to="/" className="hover:text-orange-400 transition">Home</Link>
-          <Link to="/explore" className="hover:text-orange-400 transition">Explore</Link>
-          <Link to="/about" className="hover:text-orange-400 transition">About Us</Link>
-          <Link to="/partners" className="hover:text-orange-400 transition">Partners</Link>
-          <Link to="/coins" className="hover:text-orange-400 transition">Coins</Link>
-          <Link to="/contactus" className="hover:text-orange-400 transition">Contact Us</Link>
-          <Link to="/blog" className="hover:text-orange-400 transition">Blog</Link>
-        </div>
-        <div className="text-3xl font-bold text-purple-400 mb-2">Kaamigo</div>
-        <div className="mb-2 text-sm">Connecting talent with opportunities through voice-first innovation</div>
-        <div className="text-xs text-gray-500">© 2024 Kaamigo. All rights reserved.</div>
-      </footer>
+      {/* footer rendered globally */}
     </div>
   );
 };

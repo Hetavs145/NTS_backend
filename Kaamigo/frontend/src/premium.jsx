@@ -198,26 +198,7 @@ export default function FeatureBtn() {
           </div>
         </div>
 
-        {/* Newsletter Footer */}
-        <footer className="py-8 bg-gradient-to-l from-purple-300 to-violet-200 text-center shadow-inner">
-          <h3 className="font-bold text-lg mb-2">Kaamigo</h3>
-          <p className="text-sm text-gray-600 mb-4">Stay updated with Kaamigo</p>
-          <div className="flex justify-center gap-2 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Your email"
-              className="flex-1 px-4 py-2 border rounded-l-lg"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <button
-              onClick={handleSubscribe}
-              className="bg-purple-500 text-white px-4 py-2 rounded-r-lg hover:bg-purple-600"
-            >
-              Subscribe
-            </button>
-          </div>
-        </footer>
+        {/* footer rendered globally */}
 
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

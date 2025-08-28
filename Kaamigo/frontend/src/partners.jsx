@@ -96,12 +96,7 @@ const Partners = () => (
       </div>
     </section>
 
-    {/* Footer */}
-    <footer className="bg-[#181B23] py-10 text-center text-gray-300 mt-16 animate-fade-in">
-      <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-2">Kaamigo</div>
-      <div className="mb-2 text-sm sm:text-base">Connecting talent with opportunities through voice-first innovation</div>
-      <div className="text-xs text-gray-500">© 2024 Kaamigo. All rights reserved.</div>
-    </footer>
+    {/* footer rendered globally */}
 
     {/* Animations */}
     <style>{`

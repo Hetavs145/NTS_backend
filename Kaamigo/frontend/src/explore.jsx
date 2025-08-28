@@ -1,10 +1,44 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
 import MapWithRadius from "./mapWithRedius";
 
 export default function Explore() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [status, setStatus] = useState("");
+  const [location, setLocation] = useState("");
+  const [rating, setRating] = useState(1);
+  const [price, setPrice] = useState(500);
+
+  const allFreelancers = useMemo(() => (
+    Array.from({ length: 24 }).map((_, i) => ({
+      id: i,
+      name: `Freelancer #${i + 1}`,
+      role: ["Web Developer", "Designer", "Content Writer", "Video Editor"][i % 4],
+      category: ["Tech", "Design", "Content", "Media"][i % 4],
+      status: ["Available", "Busy"][i % 2],
+      city: ["Delhi", "Mumbai", "Bengaluru", "Jaipur"][i % 4],
+      rating: (i % 5) + 1,
+      price: (i % 10) * 50,
+    }))
+  ), []);
+
+  const filtered = useMemo(() => {
+    return allFreelancers.filter((f) => {
+      const matchesQuery = query.trim().length === 0 ||
+        f.name.toLowerCase().includes(query.toLowerCase()) ||
+        f.role.toLowerCase().includes(query.toLowerCase());
+      const matchesCategory = !category || f.category === category;
+      const matchesStatus = !status || f.status === status;
+      const matchesLocation = !location || f.city.toLowerCase().includes(location.toLowerCase());
+      const matchesRating = f.rating >= rating;
+      const matchesPrice = f.price <= price;
+      return matchesQuery && matchesCategory && matchesStatus && matchesLocation && matchesRating && matchesPrice;
+    });
+  }, [allFreelancers, query, category, status, location, rating, price]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-purple-50 flex font-[Inter]">
       {/* Sidebar */}
@@ -46,32 +80,47 @@ export default function Explore() {
                 type="text"
                 placeholder="Search by name, skill..."
                 className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-purple-500"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
               />
-              <button className="mt-3 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
-                Apply Filters
-              </button>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
+                  Apply Filters
+                </button>
+                <button onClick={() => { setQuery(""); setCategory(""); setStatus(""); setLocation(""); setRating(1); setPrice(500); }} className="w-full border border-purple-600 text-purple-700 py-2 rounded hover:bg-purple-50 transition">
+                  Reset
+                </button>
+              </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
               <h2 className="text-lg font-semibold text-gray-700">Filter Options</h2>
-              <select className="w-full p-2 border rounded-lg text-sm">
-                <option>Category</option>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border rounded-lg text-sm">
+                <option value="">Category</option>
+                <option>Tech</option>
+                <option>Design</option>
+                <option>Content</option>
+                <option>Media</option>
               </select>
-              <select className="w-full p-2 border rounded-lg text-sm">
-                <option>Status</option>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full p-2 border rounded-lg text-sm">
+                <option value="">Status</option>
+                <option>Available</option>
+                <option>Busy</option>
               </select>
               <input
                 type="text"
                 placeholder="Location"
                 className="w-full p-2 border rounded-lg text-sm"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
               <div>
                 <label className="block text-sm font-medium mb-1">Rating</label>
-                <input type="range" min="1" max="5" className="w-full accent-orange-500" />
+                <input value={rating} onChange={(e) => setRating(Number(e.target.value))} type="range" min="1" max="5" className="w-full accent-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Price Range</label>
-                <input type="range" min="0" max="500" className="w-full accent-orange-500" />
+                <input value={price} onChange={(e) => setPrice(Number(e.target.value))} type="range" min="0" max="500" className="w-full accent-orange-500" />
               </div>
             </div>
 
@@ -112,16 +161,20 @@ export default function Explore() {
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers Nearby</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white p-4 rounded-xl shadow-md">
+            {filtered.map((f) => (
+              <div key={f.id} className="bg-white p-4 rounded-xl shadow-md">
                 <div className="h-24 bg-gray-200 rounded mb-2" />
-                <p className="font-semibold text-sm">Freelancer #{i + 1}</p>
-                <p className="text-xs text-gray-500">Web Developer</p>
+                <p className="font-semibold text-sm">{f.name}</p>
+                <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
+                <p className="text-xs text-gray-500">⭐ {f.rating} • ₹{f.price}</p>
                 <a href="#" className="text-xs text-purple-600 hover:underline">
                   View Profile
                 </a>
               </div>
             ))}
+            {filtered.length === 0 && (
+              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</n+div>
+            )}
           </div>
         </section>
 
