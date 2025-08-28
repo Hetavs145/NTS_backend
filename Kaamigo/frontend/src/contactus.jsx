@@ -37,35 +37,27 @@ const ContactUs = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus(null);
 
     try {
-      // In a real app, this would send the data to a backend API
-      // For now, we'll simulate sending to support@kaamigo.com
-      const emailData = {
-        to: 'support@kaamigo.com',
-        from: formData.email,
-        subject: `Contact Form: ${formData.subject}`,
-        body: `
-          Name: ${formData.name}
-          Email: ${formData.email}
-          Subject: ${formData.subject}
-          Message: ${formData.message}
-        `
-      };
+      // Create mailto link with filled fields
+      const mailtoLink = `mailto:support@kaamigo.com?subject=${encodeURIComponent(`Contact Form: ${formData.subject}`)}&body=${encodeURIComponent(`
+Name: ${formData.name}
+Email: ${formData.email}
+Subject: ${formData.subject}
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+Message:
+${formData.message}
 
-      setSubmitStatus({
-        success: true,
-        message: 'Message sent successfully! We\'ll get back to you soon.'
-      });
+---
+This message was sent from the Kaamigo contact form.
+      `)}`;
+
+      // Open default mail client
+      window.location.href = mailtoLink;
 
       // Reset form
       setFormData({
@@ -76,10 +68,9 @@ const ContactUs = () => {
       });
 
     } catch (error) {
-      setSubmitStatus({
-        success: false,
-        message: 'Failed to send message. Please try again or email us directly at support@kaamigo.com'
-      });
+      console.error('Error opening mail client:', error);
+      // Fallback: show success message
+      alert('Message prepared! Please check your default mail client.');
     } finally {
       setIsSubmitting(false);
     }
@@ -131,16 +122,6 @@ const ContactUs = () => {
               className="w-full px-4 py-2 rounded-lg border-2 border-purple-100 focus:ring-2 focus:ring-orange-300 focus:outline-none"
             ></textarea>
             
-            {submitStatus && (
-              <div className={`p-3 rounded-lg text-sm ${
-                submitStatus.success 
-                  ? 'bg-green-100 text-green-700 border border-green-200' 
-                  : 'bg-red-100 text-red-700 border border-red-200'
-              }`}>
-                {submitStatus.message}
-              </div>
-            )}
-            
             <button 
               type="submit" 
               disabled={isSubmitting}
@@ -148,8 +129,12 @@ const ContactUs = () => {
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? 'Preparing Message...' : 'Send Message'}
             </button>
+            
+            <p className="text-sm text-gray-500 text-center">
+              This will open your default mail client with a pre-filled message
+            </p>
           </form>
         </div>
 

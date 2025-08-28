@@ -13,6 +13,7 @@ const ReelModal = ({
   userProfiles,
   onClose,
   onShare,
+  onProfileClick,
 }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [likedReels, setLikedReels] = useState({});
@@ -677,25 +678,35 @@ const ReelModal = ({
 
                   {/* Username with verified badge */}
                   <div className="flex items-center gap-1 mb-2">
-                    <span className="text-white font-medium text-sm">
-                      @
-                      {userProfiles[reel.user_id]?.username ||
-                        userProfiles[reel.user_id]?.displayName ||
-                        (reel.user_id
-                          ? `user${reel.user_id.substring(0, 4)}`
-                          : "unknown")}
-                    </span>
-                    {/* Verified badge */}
-                    {userProfiles[reel.user_id]?.verified && (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="white"
-                      >
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                      </svg>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onProfileClick) {
+                          onProfileClick(reel.user_id);
+                        }
+                      }}
+                      className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+                    >
+                      <span className="text-white font-medium text-sm">
+                        @
+                        {userProfiles[reel.user_id]?.username ||
+                          userProfiles[reel.user_id]?.displayName ||
+                          (reel.user_id
+                            ? `user${reel.user_id.substring(0, 4)}`
+                            : "unknown")}
+                      </span>
+                      {/* Verified badge */}
+                      {userProfiles[reel.user_id]?.verified && (
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="white"
+                        >
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                      )}
+                    </button>
                   </div>
 
                   {/* Description */}

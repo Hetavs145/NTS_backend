@@ -8,8 +8,12 @@ import {
   FaQuestion,
   FaRocket,
   FaPlay,
+  FaHeart,
+  FaComment,
+  FaShare,
+  FaUser,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { AnimatePresence } from "framer-motion";
@@ -18,6 +22,7 @@ import ReelUpload from "./components/ReelUpload";
 import ReelModal from "./components/ReelModal";
 
 const Reels = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [userProfiles, setUserProfiles] = useState({});
 
@@ -57,8 +62,22 @@ const Reels = () => {
             description: "A short showcase of UI animations",
             category: "Design",
             tags: ["ui", "animation"],
-            user_id: "demo-user",
+            user_id: "demo-user-1",
             thumbnail_url: "https://via.placeholder.com/400x700?text=Design+Reel",
+            video_url: "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+            likes: 0,
+            shares: 0,
+            comments: [],
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "demo-2",
+            title: "Web Development Showcase",
+            description: "Building responsive web applications",
+            category: "Development",
+            tags: ["web", "react", "responsive"],
+            user_id: "demo-user-2",
+            thumbnail_url: "https://via.placeholder.com/400x700?text=Web+Dev",
             video_url: "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
             likes: 0,
             shares: 0,
@@ -106,6 +125,22 @@ const Reels = () => {
         return profile;
       }
 
+      // For demo users, create profile data
+      if (userId.startsWith('demo-user')) {
+        const profile = {
+          displayName: `Demo User ${userId.slice(-1)}`,
+          photoURL: null,
+          username: `demo${userId.slice(-1)}`,
+        };
+
+        setUserProfiles((prev) => ({
+          ...prev,
+          [userId]: profile,
+        }));
+
+        return profile;
+      }
+
       return {
         displayName: "User",
         photoURL: null,
@@ -134,6 +169,34 @@ const Reels = () => {
   const closeReelModal = () => {
     setShowModal(false);
     document.body.style.overflow = "auto"; // Restore scrolling
+  };
+
+  const handleProfileClick = (userId) => {
+    // Navigate to user profile or show user details
+    if (userId.startsWith('demo-user')) {
+      // For demo users, show a simple profile modal
+      alert(`Demo User Profile\nName: ${userProfiles[userId]?.displayName || 'Demo User'}\nUsername: ${userProfiles[userId]?.username || 'demo'}`);
+    } else {
+      // For real users, navigate to profile page
+      navigate(`/explore/profile?uid=${encodeURIComponent(userId)}`);
+    }
+  };
+
+  const handleLike = (reelId) => {
+    setReels(prev => prev.map(reel => 
+      reel.id === reelId 
+        ? { ...reel, likes: (reel.likes || 0) + 1 }
+        : reel
+    ));
+  };
+
+  const handleShare = (reelId) => {
+    setReels(prev => prev.map(reel => 
+      reel.id === reelId 
+        ? { ...reel, shares: (reel.shares || 0) + 1 }
+        : reel
+    ));
+    alert('Reel shared!');
   };
 
   return (
@@ -222,7 +285,6 @@ const Reels = () => {
               .map((reel, index) => (
                 <div
                   key={reel.id}
-                  onClick={() => openReelModal(index)}
                   className={styles.reelCard}
                 >
                   {/* Thumbnail */}
@@ -247,7 +309,7 @@ const Reels = () => {
 
                   {/* Play icon overlay */}
                   <div className={styles.playOverlay}>
-                    <div className={styles.playButton}>
+                    <div className={styles.playButton} onClick={() => openReelModal(index)}>
                       <FaPlay className="text-white text-2xl" />
                     </div>
                   </div>
@@ -263,28 +325,70 @@ const Reels = () => {
 
                     {/* User info */}
                     <div className="flex items-center gap-2 mt-1">
-                      {userProfiles[reel.user_id]?.photoURL ? (
-                        <img
-                          src={userProfiles[reel.user_id]?.photoURL}
-                          alt={
-                            userProfiles[reel.user_id]?.displayName || "User"
-                          }
-                          className="w-5 h-5 rounded-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleProfileClick(reel.user_id);
+                        }}
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                      >
+                        {userProfiles[reel.user_id]?.photoURL ? (
+                          <img
+                            src={userProfiles[reel.user_id]?.photoURL}
+                            alt={
                               userProfiles[reel.user_id]?.displayName || "User"
-                            )}&size=40&background=8B5CF6&color=fff`;
-                          }}
-                        />
-                      ) : (
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-orange-400 flex items-center justify-center text-white text-xs font-bold">
-                          {userProfiles[reel.user_id]?.displayName?.charAt(0) || "U"}
-                        </div>
-                      )}
-                      <span className="text-xs opacity-90">
-                        {userProfiles[reel.user_id]?.displayName || "User"}
-                      </span>
+                            }
+                            className="w-5 h-5 rounded-full object-cover cursor-pointer"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                userProfiles[reel.user_id]?.displayName || "User"
+                              )}&size=40&background=8B5CF6&color=fff`;
+                            }}
+                          />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-orange-400 flex items-center justify-center text-white text-xs font-bold cursor-pointer">
+                            {userProfiles[reel.user_id]?.displayName?.charAt(0) || "U"}
+                          </div>
+                        )}
+                        <span className="text-xs opacity-90">
+                          {userProfiles[reel.user_id]?.displayName || "User"}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLike(reel.id);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-red-400 transition-colors"
+                      >
+                        <FaHeart className="text-sm" />
+                        {reel.likes || 0}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openReelModal(index);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-blue-400 transition-colors"
+                      >
+                        <FaComment className="text-sm" />
+                        {reel.comments?.length || 0}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(reel.id);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-green-400 transition-colors"
+                      >
+                        <FaShare className="text-sm" />
+                        {reel.shares || 0}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -338,7 +442,6 @@ const Reels = () => {
               .map((reel, index) => (
                 <div
                   key={reel.id}
-                  onClick={() => openReelModal(index)}
                   className={styles.reelCard}
                 >
                   {/* Thumbnail */}
@@ -363,7 +466,7 @@ const Reels = () => {
 
                   {/* Play icon overlay */}
                   <div className={styles.playOverlay}>
-                    <div className={styles.playButton}>
+                    <div className={styles.playButton} onClick={() => openReelModal(index)}>
                       <FaPlay className="text-white text-2xl" />
                     </div>
                   </div>
@@ -379,35 +482,77 @@ const Reels = () => {
 
                     {/* User info */}
                     <div className="flex items-center gap-2 mt-1">
-                      {userProfiles[reel.user_id]?.photoURL ? (
-                        <img
-                          src={userProfiles[reel.user_id]?.photoURL}
-                          alt={
-                            userProfiles[reel.user_id]?.displayName || "User"
-                          }
-                          className="w-5 h-5 rounded-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleProfileClick(reel.user_id);
+                        }}
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                      >
+                        {userProfiles[reel.user_id]?.photoURL ? (
+                          <img
+                            src={userProfiles[reel.user_id]?.photoURL}
+                            alt={
                               userProfiles[reel.user_id]?.displayName || "User"
-                            )}&background=random`;
-                          }}
-                        />
-                      ) : (
-                        <div className="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs">
-                          {(
-                            (userProfiles[reel.user_id]?.displayName ||
-                              "U")[0] || "U"
-                          ).toUpperCase()}
-                        </div>
-                      )}
-                      <span className="text-xs truncate">
-                        {userProfiles[reel.user_id]?.username ||
-                          userProfiles[reel.user_id]?.displayName ||
-                          (reel.user_id
-                            ? `User ${reel.user_id.substring(0, 4)}`
-                            : "Unknown User")}
-                      </span>
+                            }
+                            className="w-5 h-5 rounded-full object-cover cursor-pointer"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                userProfiles[reel.user_id]?.displayName || "User"
+                              )}&background=random`;
+                            }}
+                          />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs cursor-pointer">
+                            {(
+                              (userProfiles[reel.user_id]?.displayName ||
+                                "U")[0] || "U"
+                            ).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="text-xs truncate">
+                          {userProfiles[reel.user_id]?.username ||
+                            userProfiles[reel.user_id]?.displayName ||
+                            (reel.user_id
+                              ? `User ${reel.user_id.substring(0, 4)}`
+                              : "Unknown User")}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLike(reel.id);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-red-400 transition-colors"
+                      >
+                        <FaHeart className="text-sm" />
+                        {reel.likes || 0}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openReelModal(index);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-blue-400 transition-colors"
+                      >
+                        <FaComment className="text-sm" />
+                        {reel.comments?.length || 0}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(reel.id);
+                        }}
+                        className="flex items-center gap-1 text-xs hover:text-green-400 transition-colors"
+                      >
+                        <FaShare className="text-sm" />
+                        {reel.shares || 0}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -432,6 +577,7 @@ const Reels = () => {
             selectedCategory={selectedCategory}
             userProfiles={userProfiles}
             onClose={closeReelModal}
+            onProfileClick={handleProfileClick}
           />
         </AnimatePresence>
       </main>

@@ -1,23 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket } from "react-icons/fa";
+import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaClock } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 export default function FeatureBtn() {
   const [selectedPlan, setSelectedPlan] = useState("basic");
-  const [showModal, setShowModal] = useState(false);
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
-
-  const handleSubscribe = () => {
-    if (!email.includes("@")) {
-      alert("Please enter a valid email.");
-      return;
-    }
-    alert("Subscribed with: " + email);
-    setEmail("");
-  };
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-orange-50 to-yellow-100 font-century-gothic">
@@ -57,114 +46,118 @@ export default function FeatureBtn() {
         {/* Hero Section */}
         <section className="bg-gradient-to-t from-orange-200 to-yellow-200 text-center py-12 px-4 rounded-lg mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-            Unlock Your Full Potential with <span className="text-purple-700">Kaamigo Pro</span>
+            <span className="text-purple-700">Kaamigo Pro</span> - Coming Soon!
           </h1>
           <p className="max-w-2xl mx-auto mb-6">
-            Experience the best of Kaamigo with advanced features, unlimited possibilities, and dedicated support for your growing business.
+            We're working hard to bring you premium features and advanced capabilities. Stay tuned for exciting updates!
           </p>
-          <button className="bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700">
-            Upgrade to Kaamigo Pro
-          </button>
-        </section>
-
-        {/* Pricing Plans */}
-        <section className="py-12 px-4">
-          <h2 className="text-2xl font-bold text-center mb-10">
-            Choose Your Perfect Plan
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Basic Plan */}
-            <div className={`bg-white border p-6 rounded-lg shadow ${selectedPlan === "basic" ? "border-purple-500 bg-purple-50" : ""}`}>
-              <h3 className="text-xl font-bold mb-2">Kaamigo Basic</h3>
-              <p className="text-2xl font-bold mb-4">₹0 <span className="text-sm font-normal">/month</span></p>
-              <ul className="space-y-2 mb-6 text-sm">
-                {["Up to 5 Projects", "Basic Analytics", "Standard Support", "Basic Profile", "Limited Reels Upload", "Basic Job Applications"].map((item, idx) => (
-                  <li key={idx}>✔ {item}</li>
-                ))}
-              </ul>
-              <button
-                className="w-full border border-purple-500 text-purple-500 py-2 rounded hover:bg-purple-100"
-                onClick={() => setSelectedPlan("basic")}
-              >
-                Start for Free
-              </button>
-            </div>
-
-            {/* Pro Plan */}
-            <div className={`bg-white border-2 p-6 rounded-lg shadow relative ${selectedPlan === "pro" ? "border-purple-500" : "border-gray-300"}`}>
-              <span className="absolute top-0 right-0 bg-purple-500 text-white text-xs px-2 py-1 rounded-bl">
-                Recommended
-              </span>
-              <h3 className="text-xl font-bold mb-2">Kaamigo Pro</h3>
-              <p className="text-2xl font-bold mb-4">₹1000 <span className="text-sm font-normal">/month</span></p>
-              <p className="text-lg font-semibold text-purple-600 mb-2">₹800/month when billed annually</p>
-              <ul className="space-y-2 mb-6 text-sm">
-                {["Unlimited Projects", "Advanced Analytics", "Advanced Collaboration", "Custom Integrations", "Dedicated Account Manager"].map((item, idx) => (
-                  <li key={idx}>✔ {item}</li>
-                ))}
-              </ul>
-              <button
-                className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600"
-                onClick={() => setShowModal(true)}
-              >
-                Upgrade to Pro
-              </button>
-            </div>
+          <div className="flex items-center justify-center gap-2 text-orange-600">
+            <FaClock className="text-xl" />
+            <span className="font-semibold">Launch Date: Q1 2025</span>
           </div>
         </section>
 
-        {/* Modal */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow max-w-sm w-full text-center">
-              <h3 className="font-bold text-lg mb-2">Upgrade to Kaamigo Pro?</h3>
-              <p className="text-sm text-gray-600 mb-4">Confirm your subscription to unlock all Pro features.</p>
-              <div className="flex justify-center gap-4">
-                <button
-                  className="px-4 py-2 bg-purple-600 text-white rounded"
-                  onClick={() => {
-                    setShowModal(false);
-                    setSelectedPlan("pro");
-                    alert("Subscribed to Pro!");
-                  }}
+        {/* Coming Soon Message */}
+        <section className="py-12 px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-purple-200">
+              <div className="text-6xl mb-6">🚀</div>
+              <h2 className="text-3xl font-bold text-purple-700 mb-4">
+                Premium Features Coming Soon!
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                We're building something amazing for our premium users. Here's what you can expect:
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="text-left">
+                  <h3 className="font-semibold text-lg text-purple-600 mb-3">For Freelancers</h3>
+                  <ul className="space-y-2 text-gray-600">
+                    <li>✓ Priority listing in search results</li>
+                    <li>✓ Advanced analytics dashboard</li>
+                    <li>✓ Custom portfolio themes</li>
+                    <li>✓ Priority customer support</li>
+                    <li>✓ Advanced skill verification</li>
+                  </ul>
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-lg text-orange-600 mb-3">For Clients</h3>
+                  <ul className="space-y-2 text-gray-600">
+                    <li>✓ Advanced filtering options</li>
+                    <li>✓ Bulk hiring tools</li>
+                    <li>✓ Project management features</li>
+                    <li>✓ Dedicated account manager</li>
+                    <li>✓ Priority dispute resolution</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-orange-50 p-6 rounded-xl border border-purple-200">
+                <h3 className="font-semibold text-lg text-purple-700 mb-2">
+                  Get Early Access
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Be the first to know when Kaamigo Pro launches and get exclusive early access offers.
+                </p>
+                <button 
+                  onClick={() => navigate('/contact')}
+                  className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-3 rounded-lg font-bold hover:scale-105 transition-all duration-300"
                 >
-                  Confirm
-                </button>
-                <button
-                  className="px-4 py-2 border rounded"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
+                  Join Waitlist
                 </button>
               </div>
             </div>
           </div>
-        )}
+        </section>
 
-        {/* Comparison Table */}
+        {/* Current Free Features */}
         <section className="py-12 px-4">
-          <h2 className="text-2xl font-bold text-center mb-8">
-            Detailed Feature Comparison
+          <h2 className="text-2xl font-bold text-center mb-10">
+            What's Available Now (Free)
           </h2>
-          <div className="overflow-x-auto max-w-5xl mx-auto">
-            <table className="w-full table-auto border-collapse text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-3 text-left">Feature</th>
-                  <th className="p-3 text-center">Free Plan</th>
-                  <th className="p-3 text-center">Kaamigo Pro</th>
-                </tr>
-              </thead>
-              <tbody>
-                {["Project Limit", "Storage", "Team Members", "Basic Analytics", "Advanced Analytics", "Priority Email Support", "Phone Support", "Custom Branding", "Advanced Collaboration Tools", "Version History", "API Access", "Dedicated Account Manager", "SLA (Service Level Agreements)"].map((feature, idx) => (
-                  <tr key={idx} className="border-b">
-                    <td className="p-3">{feature}</td>
-                    <td className="p-3 text-center">{idx < 3 ? "✔" : "❌"}</td>
-                    <td className="p-3 text-center">✔</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Basic Plan */}
+            <div className="bg-white border-2 border-purple-200 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-bold mb-2">Kaamigo Basic</h3>
+              <p className="text-2xl font-bold mb-4 text-green-600">₹0 <span className="text-sm font-normal">/month</span></p>
+              <ul className="space-y-2 mb-6 text-sm">
+                <li>✓ Up to 10 Projects</li>
+                <li>✓ Basic Analytics</li>
+                <li>✓ Standard Support</li>
+                <li>✓ Basic Profile</li>
+                <li>✓ Reels Upload (5/month)</li>
+                <li>✓ Job Applications</li>
+                <li>✓ Voice Communication</li>
+                <li>✓ Map-based Discovery</li>
+              </ul>
+              <div className="text-center">
+                <span className="text-green-600 font-semibold">Currently Active</span>
+              </div>
+            </div>
+
+            {/* Pro Plan - Coming Soon */}
+            <div className="bg-white border-2 border-gray-300 p-6 rounded-lg shadow-lg opacity-75">
+              <div className="text-center mb-4">
+                <span className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                  Coming Soon
+                </span>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Kaamigo Pro</h3>
+              <p className="text-2xl font-bold mb-4 text-gray-400">₹1000 <span className="text-sm font-normal">/month</span></p>
+              <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                <li>⏳ Unlimited Projects</li>
+                <li>⏳ Advanced Analytics</li>
+                <li>⏳ Advanced Collaboration</li>
+                <li>⏳ Custom Integrations</li>
+                <li>⏳ Dedicated Account Manager</li>
+              </ul>
+              <button 
+                disabled
+                className="w-full bg-gray-300 text-gray-500 py-2 rounded cursor-not-allowed"
+              >
+                Coming Soon
+              </button>
+            </div>
           </div>
         </section>
 
@@ -191,7 +184,7 @@ export default function FeatureBtn() {
                 key={item.name}
                 className="min-w-[280px] snap-center bg-white p-10 rounded-md shadow text-sm text-gray-700 flex-shrink-0"
               >
-                <p className="mb-2 italic">“{item.quote}”</p>
+                <p className="mb-2 italic">"{item.quote}"</p>
                 <p className="font-semibold">{item.name}</p>
                 <p className="text-xs text-gray-500">{item.role}</p>
               </div>
