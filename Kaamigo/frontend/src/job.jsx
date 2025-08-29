@@ -14,7 +14,9 @@ import PostGigModal from "./postgig";
 import PostJobModal from "./PostJobModal";
 import ApplyGigModal from "./ApplyGigModal";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -24,11 +26,32 @@ export default function Jobs() {
   const [showJobModal, setShowJobModal] = useState(false);
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.body.style.overflow = showModal ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
   }, [showModal]);
+
+  // Fetch user profile to determine user type
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setUserProfile(userDoc.data());
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const [gigs, setGigs] = useState([]);
 
@@ -176,18 +199,26 @@ export default function Jobs() {
             <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500">
               Browse Jobs
             </button>
-                        <button
-              onClick={() => setShowModal(true)}
-              className="bg-white text-orange-600 px-4 py-2 border border-orange-500 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500 hover:text-white"
-            >
-              Post a Gig
-            </button>
-            <button
-              onClick={() => setShowJobModal(true)}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Post a Job
-            </button>
+            {!loading && userProfile && (
+              <>
+                {userProfile.userType === 'freelancer' && (
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="bg-white text-orange-600 px-4 py-2 border border-orange-500 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500 hover:text-white"
+                  >
+                    Post a Gig
+                  </button>
+                )}
+                {userProfile.userType === 'client' && (
+                  <button
+                    onClick={() => setShowJobModal(true)}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Post a Job
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import { FaVideo, FaBriefcase, FaUserAlt, FaCrown, FaQuestion, FaRocket, FaTimes
 import MapWithRadius from "./mapWithRedius";
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
+import FreelancerCard from "./components/FreelancerCard";
 
 export default function Explore() {
   const locationHook = useLocation();
@@ -14,7 +15,7 @@ export default function Explore() {
   const [status, setStatus] = useState("");
   const [location, setLocation] = useState("");
   const [rating, setRating] = useState(1);
-  const [price, setPrice] = useState(500);
+  const [price, setPrice] = useState(50000);
 
   const [remoteFreelancers, setRemoteFreelancers] = useState([]);
   const [featuredFreelancers, setFeaturedFreelancers] = useState([]);
@@ -241,7 +242,7 @@ export default function Explore() {
                 <button onClick={applyFilters} className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
                   Apply Filters
                 </button>
-                <button onClick={() => { setQuery(""); setCategory(""); setStatus(""); setLocation(""); setRating(1); setPrice(500); }} className="w-full border border-purple-600 text-purple-700 py-2 rounded hover:bg-purple-50 transition">
+                <button onClick={() => { setQuery(""); setCategory(""); setStatus(""); setLocation(""); setRating(1); setPrice(50000); }} className="w-full border border-purple-600 text-purple-700 py-2 rounded hover:bg-purple-50 transition">
                   Reset
                 </button>
               </div>
@@ -284,36 +285,32 @@ export default function Explore() {
                   ))}
                   <span className="text-sm text-gray-600 ml-2 self-center">+</span>
                 </div>
+                <div className="text-xs text-gray-500 mt-1 text-center">
+                  {rating === 5 ? 'Excellent (5★)' : 
+                   rating === 4 ? 'Very Good (4★+)' : 
+                   rating === 3 ? 'Good (3★+)' : 
+                   rating === 2 ? 'Fair (2★+)' : 'Any Rating (1★+)'}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Price Range (₹)</label>
-                <input value={price} onChange={(e) => setPrice(Number(e.target.value))} type="range" min="0" max="500" className="w-full accent-orange-500" />
-                <div className="text-xs text-gray-500 mt-1">₹0 - ₹{price}</div>
+                <input value={price} onChange={(e) => setPrice(Number(e.target.value))} type="range" min="0" max="50000" step="1000" className="w-full accent-orange-500" />
+                <div className="text-xs text-gray-500 mt-1">₹0 - ₹{price.toLocaleString()}</div>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">Nearby Freelancers (10km)</h2>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Nearby Freelancers (10km)</h2>
               {nearbyFreelancers.slice(0, 5).map((f, i) => (
-                <div key={f.id} className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-orange-400 rounded-full mr-3 flex items-center justify-center text-white font-bold text-lg">
-                    {f.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{f.name}</p>
-                    <p className="text-sm text-gray-500">{f.role}</p>
-                    <p className="text-xs text-gray-400">⭐ {f.rating} • ₹{f.price}</p>
-                    <button 
-                      onClick={() => handleViewDetails(f)} 
-                      className="text-sm text-purple-600 hover:underline flex items-center gap-1"
-                    >
-                      <FaEye className="text-xs" /> View Details
-                    </button>
-                  </div>
-                </div>
+                <FreelancerCard
+                  key={f.id}
+                  freelancer={f}
+                  onViewDetails={handleViewDetails}
+                  variant="nearby"
+                />
               ))}
               {nearbyFreelancers.length === 0 && (
-                <p className="text-sm text-gray-500 text-center">No nearby freelancers found</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center">No nearby freelancers found</p>
               )}
             </div>
           </aside>
@@ -336,43 +333,31 @@ export default function Explore() {
 
         {/* Featured Freelancers */}
         <section className="mt-10">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">Featured Freelancers</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">Featured Freelancers</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             {featuredFreelancers.map((f) => (
-              <div key={f.id} className="bg-gradient-to-br from-purple-50 to-orange-50 border-2 border-purple-200 p-4 rounded-xl shadow-md relative">
-                <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
-                  PRO
-                </div>
-                <div className="h-24 bg-gradient-to-br from-purple-400 to-orange-400 rounded mb-2 flex items-center justify-center text-white font-bold text-2xl">
-                  {f.name.charAt(0)}
-                </div>
-                <p className="font-semibold text-sm">{f.name}</p>
-                <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
-                <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <button onClick={() => handleViewDetails(f)} className="text-xs text-purple-600 hover:underline flex items-center gap-1 justify-center w-full mt-2">
-                  <FaEye className="text-xs" /> View Details
-                </button>
-              </div>
+              <FreelancerCard
+                key={f.id}
+                freelancer={f}
+                onViewDetails={handleViewDetails}
+                variant="featured"
+                showProBadge={true}
+              />
             ))}
           </div>
           
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">All Freelancers</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">All Freelancers</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filtered.filter(f => !f.isPro).map((f) => (
-              <div key={f.id} className="bg-white p-4 rounded-xl shadow-md">
-                <div className="h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded mb-2 flex items-center justify-center text-gray-600 font-bold text-2xl">
-                  {f.name.charAt(0)}
-                </div>
-                <p className="font-semibold text-sm">{f.name}</p>
-                <p className="text-xs text-gray-500">{f.role} • {f.city}</p>
-                <p className="text-xs text-gray-500">⭐ {f.rating} • {f.reviews || 0} reviews • ₹{f.price}</p>
-                <button onClick={() => handleViewDetails(f)} className="text-xs text-purple-600 hover:underline flex items-center gap-1 justify-center w-full mt-2">
-                  <FaEye className="text-xs" /> View Details
-                </button>
-              </div>
+              <FreelancerCard
+                key={f.id}
+                freelancer={f}
+                onViewDetails={handleViewDetails}
+                variant="default"
+              />
             ))}
             {filtered.filter(f => !f.isPro).length === 0 && (
-              <div className="col-span-full text-center text-sm text-gray-500">No freelancers match your filters.</div>
+              <div className="col-span-full text-center text-sm text-gray-500 dark:text-gray-400">No freelancers match your filters.</div>
             )}
           </div>
         </section>
