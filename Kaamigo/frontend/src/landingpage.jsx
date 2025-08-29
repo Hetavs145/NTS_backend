@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link, NavLink } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
-import { FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { FiLogOut, FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 
 // Dynamic styling for active nav links
 const navLinkClass = ({ isActive }) =>
@@ -19,6 +19,7 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`flex flex-wrap items-center justify-between px-6 md:px-8 py-4 md:py-6 border-b shadow-sm transition-all duration-300 ${
+    <nav className={`flex flex-wrap items-center justify-between px-4 md:px-8 py-3 md:py-6 border-b shadow-sm transition-all duration-300 ${
       darkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-indigo-50 text-gray-800 border-gray-200'
     }`}>
       {/* Logo */}
@@ -59,7 +60,7 @@ const Navbar = () => {
       </NavLink>
 
       {/* Navigation links */}
-      <div className="hidden md:flex flex-wrap space-x-2 text-base font-medium">
+      <div className="hidden lg:flex flex-wrap space-x-2 text-base font-medium">
         <NavLink to="/" className={navLinkClass} end>Home</NavLink>
         <NavLink to="/explore" className={navLinkClass}>Explore</NavLink>
         <NavLink to="/about" className={navLinkClass}>About Us</NavLink>
@@ -69,8 +70,16 @@ const Navbar = () => {
         <NavLink to="/blog" className={navLinkClass}>Blog</NavLink>
       </div>
 
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="lg:hidden p-2 text-gray-600 hover:text-gray-800 transition-colors"
+      >
+        {mobileMenuOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+      </button>
+
       {/* Auth Buttons and Dark Mode Toggle */}
-      <div className="flex items-center space-x-4 mt-4 md:mt-0">
+      <div className="flex items-center space-x-2 md:space-x-4 mt-4 md:mt-0">
         {/* Dark Mode Toggle */}
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -106,6 +115,21 @@ const Navbar = () => {
           </>
         )}
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="px-4 py-2 space-y-1">
+            <NavLink to="/" className={navLinkClass} end onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
+            <NavLink to="/explore" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Explore</NavLink>
+            <NavLink to="/about" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>About Us</NavLink>
+            <NavLink to="/partners" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Partners</NavLink>
+            <NavLink to="/coins" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Coins</NavLink>
+            <NavLink to="/contact" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Contact Us</NavLink>
+            <NavLink to="/blog" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Blog</NavLink>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
@@ -117,7 +141,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-gray-800">
        {/* Hero Section */}
-      <div className="bg-gradient-to-br from-orange-100 via-purple-100 to-orange-50 py-24 md:py-32 text-center px-4 sm:px-6">
+      <div className="bg-gradient-to-br from-purple-100 via-orange-100 to-pink-100 py-24 md:py-32 text-center px-4 sm:px-6">
         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 animate-pulse">
           Reels Bhi. Rozgaar Bhi.
         </h1>
@@ -226,7 +250,9 @@ const LandingPage = () => {
             { title: 'Bringing Ideas to Life Through Design', name: 'Rohan Gupta', views: '5.2K views' },
           ].map((reel, index) => (
             <div key={index} className="min-w-[300px] bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-orange-200 hover:border-orange-400">
-              <div className="bg-gradient-to-br from-purple-300 to-orange-300 h-48 rounded-t-xl"></div>
+              <div className="bg-gradient-to-br from-purple-300 to-orange-300 h-48 rounded-t-xl flex items-center justify-center">
+                <div className="text-white text-4xl font-bold">🎥</div>
+              </div>
               <div className="p-6">
                 <h3 className="font-semibold text-lg mb-2 text-purple-700">{reel.title}</h3>
                 <p className="text-base text-gray-600 mb-1">{reel.name}</p>

@@ -63,17 +63,26 @@ export default function Profile() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
+          // Auto-verify email if user signed up through email
+          const emailVerified = user.emailVerified || user.providerData.some(provider => provider.providerId === 'password');
+          const verification = {
+            ...data.verification,
+            email: emailVerified || data.verification?.email || false
+          };
+          
           setProfile({
             ...data,
             userType: data.userType || "freelancer",
-            verification: data.verification || {
-              govtId: false,
-              phone: false,
-              email: false,
-              address: false,
-              panSsn: false
-            }
+            verification: verification
           });
+          
+          // Update verification status in database if email is verified
+          if (emailVerified && !data.verification?.email) {
+            await setDoc(doc(db, "users", user.uid), {
+              ...data,
+              verification: verification
+            }, { merge: true });
+          }
         }
       } catch (err) {
         setError("Failed to fetch profile");
@@ -364,12 +373,21 @@ export default function Profile() {
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg max-w-sm w-full">
                   <h3 className="text-lg font-semibold mb-4">Update Profile Picture</h3>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePicUpload}
-                    className="w-full mb-4"
-                  />
+                  <div className="relative mb-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePicUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      id="profile-pic-upload"
+                    />
+                    <label
+                      htmlFor="profile-pic-upload"
+                      className="block w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-purple-400 transition-colors"
+                    >
+                      <span className="text-gray-500">📁 Choose file</span>
+                    </label>
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setProfilePicEdit(false)}
@@ -401,13 +419,13 @@ export default function Profile() {
             </div>
             <button
               onClick={handleBook}
-              className="mt-4 bg-purple-500 text-white px-6 py-3 rounded hover:bg-purple-600"
+              className="mt-4 bg-purple-500 text-white px-6 py-3 rounded hover:bg-purple-600 transition-colors"
             >
               {isBooked ? "Booked!" : "Book Session"}
             </button>
             <button
               onClick={handleMessage}
-              className="mt-2 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100"
+              className="mt-4 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100 transition-colors"
             >
               {messageSent ? "Message Sent" : "Send Message"}
             </button>
@@ -528,7 +546,21 @@ export default function Profile() {
                 <textarea name="about" value={aboutForm.about} onChange={handleAboutChange} placeholder="About Me" className="w-full p-2 border rounded" />
                 <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
                 <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
-                <input type="file" accept="video/*" onChange={handleReelUpload} className="w-full" />
+                <div className="relative">
+                  <input 
+                    type="file" 
+                    accept="video/*" 
+                    onChange={handleReelUpload} 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    id="reel-upload"
+                  />
+                  <label 
+                    htmlFor="reel-upload" 
+                    className="block w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-purple-400 transition-colors"
+                  >
+                    <span className="text-gray-500">📁 Choose file</span>
+                  </label>
+                </div>
                 {aboutForm.featuredReel && (
                   <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
                 )}

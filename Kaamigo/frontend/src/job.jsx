@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import PostGigModal from "./postgig";
+import PostJobModal from "./PostJobModal";
 import ApplyGigModal from "./ApplyGigModal";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
@@ -20,6 +21,7 @@ const SpeechRecognition =
 
 export default function Jobs() {
   const [showModal, setShowModal] = useState(false);
+  const [showJobModal, setShowJobModal] = useState(false);
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
 
@@ -72,18 +74,47 @@ export default function Jobs() {
   const hasMic = Boolean(SpeechRecognition);
 
   const startVoiceSearch = () => {
-    if (!hasMic) return;
-    const recog = new SpeechRecognition();
-    recog.lang = "en-US";
-    recog.interimResults = false;
-    recog.onstart = () => setListening(true);
-    recog.onerror = () => setListening(false);
-    recog.onend = () => setListening(false);
-    recog.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setQuery(transcript);
-    };
-    recog.start();
+    if (!hasMic) {
+      alert("Voice recognition is not supported in your browser. Please use Chrome or Edge.");
+      return;
+    }
+    
+    try {
+      const recog = new SpeechRecognition();
+      recog.lang = "en-US";
+      recog.interimResults = false;
+      recog.continuous = false;
+      
+      recog.onstart = () => {
+        setListening(true);
+        console.log("Voice recognition started");
+      };
+      
+      recog.onerror = (event) => {
+        console.error("Voice recognition error:", event.error);
+        setListening(false);
+        if (event.error === 'not-allowed') {
+          alert("Please allow microphone access for voice search.");
+        }
+      };
+      
+      recog.onend = () => {
+        setListening(false);
+        console.log("Voice recognition ended");
+      };
+      
+      recog.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log("Voice transcript:", transcript);
+        setQuery(transcript);
+        setListening(false);
+      };
+      
+      recog.start();
+    } catch (error) {
+      console.error("Error starting voice recognition:", error);
+      alert("Voice recognition failed to start. Please try again.");
+    }
   };
 
   const filteredGigs = useMemo(() => {
@@ -145,11 +176,17 @@ export default function Jobs() {
             <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500">
               Browse Jobs
             </button>
-            <button
+                        <button
               onClick={() => setShowModal(true)}
               className="bg-white text-orange-600 px-4 py-2 border border-orange-500 rounded-lg hover:bg-gradient-to-r from-orange-500 to-yellow-500 hover:text-white"
             >
-              Post a Gig
+              Post a Gig
+            </button>
+            <button
+              onClick={() => setShowJobModal(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Post a Job
             </button>
           </div>
         </div>
@@ -284,6 +321,11 @@ export default function Jobs() {
           open={showModal}
           onClose={() => setShowModal(false)}
           onGigPosted={handleAddGig}
+        />
+        <PostJobModal
+          open={showJobModal}
+          onClose={() => setShowJobModal(false)}
+          onJobPosted={handleAddGig}
         />
         <ApplyGigModal
           open={applyModalOpen}

@@ -238,7 +238,7 @@ const ReelModal = ({
 
   // Auto-play current video
   useEffect(() => {
-    if (showModal) {
+    if (showModal && !commentingReelId) {
       // Pause all videos first
       Object.values(videoRefs.current).forEach((videoRef) => {
         if (videoRef && typeof videoRef.pause === "function") {
@@ -260,7 +260,7 @@ const ReelModal = ({
         }, 100);
       }
     }
-  }, [showModal, currentReelIndex, isMuted]);
+  }, [showModal, currentReelIndex, isMuted, commentingReelId]);
 
   // Handle keyboard navigation
   useEffect(() => {

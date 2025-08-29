@@ -10,3 +10,49 @@ body {
 body::-webkit-scrollbar {
   display: none;             /* Chrome/Safari */
 }
+
+/* Dark mode styles */
+.dark {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.dark .bg-white {
+  background-color: #374151;
+}
+
+.dark .text-gray-800 {
+  color: #f9fafb;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+.dark .border-gray-200 {
+  border-color: #4b5563;
+}
+
+.dark .border-gray-300 {
+  border-color: #6b7280;
+}
+
+.dark .bg-gray-50 {
+  background-color: #374151;
+}
+
+.dark .bg-gray-100 {
+  background-color: #4b5563;
+}
+
+.dark .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
