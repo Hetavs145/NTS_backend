@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link, NavLink } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
-import { FiLogOut, FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
+import { FiLogOut, FiSun, FiMoon, FiMenu, FiX, FiMessageCircle } from 'react-icons/fi';
 
 // Dynamic styling for active nav links
 const navLinkClass = ({ isActive }) =>
@@ -80,6 +80,21 @@ const Navbar = () => {
 
       {/* Auth Buttons and Dark Mode Toggle */}
       <div className="flex items-center space-x-2 md:space-x-4 mt-4 md:mt-0">
+        {/* Chat Icon - Only show when signed in */}
+        {isSignedIn && (
+          <button
+            onClick={() => navigate('/chat')}
+            className={`p-2 rounded-lg transition-colors duration-300 ${
+              darkMode 
+                ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' 
+                : 'bg-blue-200 text-blue-700 hover:bg-blue-300'
+            }`}
+            title="Chat"
+          >
+            <FiMessageCircle className="text-lg" />
+          </button>
+        )}
+        
         {/* Dark Mode Toggle */}
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -118,15 +133,44 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-          <div className="px-4 py-2 space-y-1">
-            <NavLink to="/" className={navLinkClass} end onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
-            <NavLink to="/explore" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Explore</NavLink>
-            <NavLink to="/about" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>About Us</NavLink>
-            <NavLink to="/partners" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Partners</NavLink>
-            <NavLink to="/coins" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Coins</NavLink>
-            <NavLink to="/contact" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Contact Us</NavLink>
-            <NavLink to="/blog" className={navLinkClass} onClick={() => setMobileMenuOpen(false)}>Blog</NavLink>
+        <div className="lg:hidden fixed top-0 right-0 h-full w-64 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl z-50 transform transition-transform duration-300">
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Menu</h3>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
+              >
+                <FiX className="text-xl" />
+              </button>
+            </div>
+            
+            {/* Navigation Links */}
+            <div className="flex-1 px-4 py-6 space-y-3">
+              <NavLink to="/" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} end onClick={() => setMobileMenuOpen(false)}>Home</NavLink>
+              <NavLink to="/explore" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>Explore</NavLink>
+              <NavLink to="/about" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>About Us</NavLink>
+              <NavLink to="/partners" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>Partners</NavLink>
+              <NavLink to="/coins" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>Coins</NavLink>
+              <NavLink to="/contact" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>Contact Us</NavLink>
+              <NavLink to="/blog" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-700 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>Blog</NavLink>
+              {isSignedIn && (
+                <NavLink to="/chat" className={`block px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:text-purple-700 dark:hover:text-white transition-all duration-300 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-purple-50'}`} onClick={() => setMobileMenuOpen(false)}>
+                  <div className="flex items-center gap-2">
+                    <FiMessageCircle className="text-lg" />
+                    <span>Chat</span>
+                  </div>
+                </NavLink>
+              )}
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                © 2024 Kaamigo
+              </div>
+            </div>
           </div>
         </div>
       )}

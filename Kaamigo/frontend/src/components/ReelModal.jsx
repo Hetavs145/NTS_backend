@@ -66,6 +66,10 @@ const ReelModal = ({
         videoRefs.current[`modal-${currentReelIndex}`].pause();
       }
 
+      // Reset comment state when switching reels
+      setCommentingReelId(null);
+      setCommentInput("");
+
       setCurrentReelIndex(newIndex);
       setIsPlaying(true);
 
@@ -84,6 +88,10 @@ const ReelModal = ({
   const closeReelModal = () => {
     onClose();
     document.body.style.overflow = "auto";
+    
+    // Reset comment state
+    setCommentingReelId(null);
+    setCommentInput("");
 
     // Pause all videos
     Object.values(videoRefs.current).forEach((video) => {
@@ -862,7 +870,7 @@ const ReelModal = ({
         ))}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;

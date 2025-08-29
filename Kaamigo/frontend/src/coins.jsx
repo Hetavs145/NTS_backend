@@ -59,6 +59,18 @@ const Coins = () => {
     { name: 'Frank White', coins: 5310, change: '+90' },
   ]);
   const [lastUpdated, setLastUpdated] = useState('Just now');
+  const [canCollectDailyBonus, setCanCollectDailyBonus] = useState(true);
+  const [completedTasks, setCompletedTasks] = useState(new Set());
+
+  // Check if daily bonus can be collected
+  useEffect(() => {
+    const lastBonusTime = localStorage.getItem('lastDailyBonus');
+    if (lastBonusTime) {
+      const timeDiff = Date.now() - parseInt(lastBonusTime);
+      const hoursDiff = timeDiff / (1000 * 60 * 60);
+      setCanCollectDailyBonus(hoursDiff >= 24);
+    }
+  }, []);
 
   // Simulate real-time updates
   useEffect(() => {
@@ -93,8 +105,17 @@ const Coins = () => {
   }, []);
 
   const handleDailyBonus = () => {
+    if (!canCollectDailyBonus) {
+      alert('Daily bonus already collected! Come back in 24 hours.');
+      return;
+    }
+    
     const bonus = 50;
     setCoins(prev => prev + bonus);
+    setCanCollectDailyBonus(false);
+    
+    // Store the time when bonus was collected
+    localStorage.setItem('lastDailyBonus', Date.now().toString());
     
     const newTransaction = {
       id: Date.now(),
@@ -112,7 +133,13 @@ const Coins = () => {
   };
 
   const handleTaskComplete = (taskTitle, taskCoins) => {
+    if (completedTasks.has(taskTitle)) {
+      alert('This task has already been completed!');
+      return;
+    }
+    
     setCoins(prev => prev + taskCoins);
+    setCompletedTasks(prev => new Set([...prev, taskTitle]));
     
     const newTransaction = {
       id: Date.now(),
@@ -162,9 +189,15 @@ const Coins = () => {
             </div>
             <button 
               onClick={handleDailyBonus}
-              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-orange-400 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold text-lg flex items-center justify-center gap-2"
+              disabled={!canCollectDailyBonus}
+              className={`w-full sm:w-auto px-6 py-3 rounded-xl shadow-lg transition font-bold text-lg flex items-center justify-center gap-2 ${
+                canCollectDailyBonus 
+                  ? 'bg-gradient-to-r from-purple-500 to-orange-400 text-white hover:scale-105' 
+                  : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              }`}
             >
-              <FaGift className="text-xl" />Collect Daily Bonus
+              <FaGift className="text-xl" />
+              {canCollectDailyBonus ? 'Collect Daily Bonus' : 'Already Collected'}
             </button>
           </div>
           <div className="w-full md:w-80 bg-white rounded-2xl shadow-xl p-6 border border-orange-100">
@@ -204,9 +237,14 @@ const Coins = () => {
                     <div className="text-orange-500 font-bold flex items-center"><span className="mr-1">🪙</span>{task.coins} Coins</div>
                     <button 
                       onClick={() => handleTaskComplete(task.title, task.coins)}
-                      className="bg-gradient-to-r from-purple-500 to-orange-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition font-semibold"
+                      disabled={completedTasks.has(task.title)}
+                      className={`px-4 py-2 rounded-lg shadow transition font-semibold ${
+                        completedTasks.has(task.title)
+                          ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-purple-500 to-orange-400 text-white hover:scale-105'
+                      }`}
                     >
-                      Complete Task
+                      {completedTasks.has(task.title) ? 'Completed' : 'Complete Task'}
                     </button>
                   </div>
                 </div>

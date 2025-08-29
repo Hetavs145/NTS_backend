@@ -11,18 +11,61 @@ body::-webkit-scrollbar {
   display: none;             /* Chrome/Safari */
 }
 
-/* Dark mode styles */
+/* Dark mode styles - applied to individual components */
 .dark {
-  background-color: #1f2937;
   color: #f9fafb;
 }
 
 .dark .bg-white {
+  background-color: #1f2937;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1f2937;
+}
+
+.dark .bg-gray-200 {
   background-color: #374151;
+}
+
+.dark .bg-gray-300 {
+  background-color: #4b5563;
+}
+
+.dark .bg-gray-400 {
+  background-color: #6b7280;
+}
+
+.dark .bg-gray-500 {
+  background-color: #6b7280;
+}
+
+.dark .bg-gray-600 {
+  background-color: #4b5563;
+}
+
+.dark .bg-gray-700 {
+  background-color: #374151;
+}
+
+.dark .bg-gray-800 {
+  background-color: #1f2937;
+}
+
+.dark .bg-gray-900 {
+  background-color: #111827;
 }
 
 .dark .text-gray-800 {
   color: #f9fafb;
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb;
 }
 
 .dark .text-gray-600 {
@@ -33,20 +76,44 @@ body::-webkit-scrollbar {
   color: #9ca3af;
 }
 
+.dark .text-gray-400 {
+  color: #9ca3af;
+}
+
+.dark .text-gray-300 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-200 {
+  color: #e5e7eb;
+}
+
+.dark .text-gray-100 {
+  color: #f3f4f6;
+}
+
 .dark .border-gray-200 {
-  border-color: #4b5563;
+  border-color: #374151;
 }
 
 .dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+.dark .border-gray-400 {
   border-color: #6b7280;
 }
 
-.dark .bg-gray-50 {
-  background-color: #374151;
+.dark .border-gray-500 {
+  border-color: #6b7280;
 }
 
-.dark .bg-gray-100 {
-  background-color: #4b5563;
+.dark .border-gray-600 {
+  border-color: #4b5563;
+}
+
+.dark .border-gray-700 {
+  border-color: #374151;
 }
 
 .dark .shadow {
@@ -55,4 +122,41 @@ body::-webkit-scrollbar {
 
 .dark .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode for specific components */
+.dark .bg-gradient-to-br.from-purple-50.to-orange-50 {
+  background: linear-gradient(to bottom right, #1f2937, #374151);
+}
+
+.dark .bg-gradient-to-br.from-orange-50.to-yellow-100 {
+  background: linear-gradient(to bottom right, #1f2937, #374151);
+}
+
+.dark .bg-gradient-to-br.from-purple-50.to-orange-100 {
+  background: linear-gradient(to bottom right, #1f2937, #374151);
+}
+
+.dark .bg-gradient-to-br.from-purple-100.via-orange-100.to-pink-100 {
+  background: linear-gradient(to bottom right, #1f2937, #374151, #4b5563);
+}
+
+.dark .bg-gradient-to-t.from-orange-200.to-yellow-200 {
+  background: linear-gradient(to top, #374151, #4b5563);
+}
+
+.dark .bg-gradient-to-t.from-purple-200.to-blue-100 {
+  background: linear-gradient(to top, #374151, #4b5563);
+}
+
+.dark .bg-gradient-to-t.from-purple-400.via-violet-400.to-indigo-400 {
+  background: linear-gradient(to top, #1f2937, #374151, #4b5563);
 }

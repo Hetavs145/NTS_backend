@@ -52,7 +52,7 @@ const Reels = () => {
       querySnapshot.forEach((doc) => {
         reelsData.push({ id: doc.id, ...doc.data() });
       });
-      console.log("Fetched reels:", reelsData);
+      // console.log("Fetched reels:", reelsData); // Removed console.log to prevent data leak
       if (reelsData.length === 0) {
         // Fallback dummy reels to demonstrate UI when no content present
         setReels([
@@ -398,6 +398,43 @@ const Reels = () => {
 
         {/* Upload Reels */}
         <ReelUpload onUploadSuccess={fetchReels} />
+
+        {/* Featured Reels for Pro Users */}
+        <section className="bg-white p-7 rounded-xl shadow-lg border border-purple-100 space-y-4">
+          <h2 className="text-3xl font-bold text-purple-600">
+            👑 Featured Reels (Pro Users)
+          </h2>
+          <div className="relative">
+            <div className="flex gap-6 overflow-x-auto px-2 pb-2 scrollbar-thin scrollbar-thumb-purple-400">
+              {reels
+                .filter(reel => userProfiles[reel.user_id]?.isPro || userProfiles[reel.user_id]?.subscription === 'pro')
+                .slice(0, 7)
+                .map((reel, i) => (
+                  <div
+                    key={reel.id}
+                    className="text-center space-y-2 min-w-[120px] shadow rounded-lg p-4 bg-gradient-to-br from-purple-50 to-orange-50 border-2 border-purple-200 hover:shadow-xl transition cursor-pointer"
+                    onClick={() => openReelModal(reels.indexOf(reel))}
+                  >
+                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-orange-400 rounded-full shadow-inner flex items-center justify-center text-white font-bold text-lg relative">
+                      {userProfiles[reel.user_id]?.displayName?.charAt(0) || 'P'}
+                      <div className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs px-1 py-0.5 rounded-full">PRO</div>
+                    </div>
+                    <p className="font-medium text-sm">{userProfiles[reel.user_id]?.displayName || 'Pro User'}</p>
+                    <p className="text-xs text-gray-500">{reel.category || 'Content'}</p>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-yellow-500">⭐</span>
+                      <span className="text-xs text-gray-600">4.{i + 2}</span>
+                    </div>
+                  </div>
+                ))}
+              {reels.filter(reel => userProfiles[reel.user_id]?.isPro || userProfiles[reel.user_id]?.subscription === 'pro').length === 0 && (
+                <div className="text-center text-gray-500 py-8 w-full">
+                  No featured reels from pro users yet.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
 
         {/* Featured Freelancers (Nearby) */}
         <section className="bg-white p-7 rounded-xl shadow-lg border border-purple-100 space-y-4">

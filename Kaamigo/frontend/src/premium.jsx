@@ -51,10 +51,7 @@ export default function FeatureBtn() {
           <p className="max-w-2xl mx-auto mb-6">
             We're working hard to bring you premium features and advanced capabilities. Stay tuned for exciting updates!
           </p>
-          <div className="flex items-center justify-center gap-2 text-orange-600">
-            <FaClock className="text-xl" />
-            <span className="font-semibold">Launch Date: Q1 2025</span>
-          </div>
+          {/* Launch date removed */}
         </section>
 
         {/* Coming Soon Message */}

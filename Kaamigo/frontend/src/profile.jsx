@@ -417,18 +417,7 @@ export default function Profile() {
                 <span className="block font-bold text-black">{profile.projects || "-"}</span>Projects
               </div>
             </div>
-            <button
-              onClick={handleBook}
-              className="mt-4 bg-purple-500 text-white px-6 py-3 rounded hover:bg-purple-600 transition-colors"
-            >
-              {isBooked ? "Booked!" : "Book Session"}
-            </button>
-            <button
-              onClick={handleMessage}
-              className="mt-4 border px-6 py-3 rounded text-purple-500 hover:bg-purple-100 transition-colors"
-            >
-              {messageSent ? "Message Sent" : "Send Message"}
-            </button>
+            {/* Remove book session and send message buttons */}
             
             {/* Show Hire button only for clients */}
             {profile.userType === 'client' && (
@@ -472,42 +461,25 @@ export default function Profile() {
               </li>
               <li className="flex items-center justify-between">
                 <span>Email</span>
-                <button
-                  onClick={() => handleVerificationUpdate('email', !profile.verification.email)}
-                  className={`px-2 py-1 rounded text-xs ${
-                    profile.verification.email 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {profile.verification.email ? 'Verified' : 'Verify'}
-                </button>
+                <span className={`px-2 py-1 rounded text-xs ${
+                  profile.verification.email 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  {profile.verification.email ? 'Verified' : 'Coming Soon'}
+                </span>
               </li>
               <li className="flex items-center justify-between">
                 <span>Address</span>
-                <button
-                  onClick={() => handleVerificationUpdate('address', !profile.verification.address)}
-                  className={`px-2 py-1 rounded text-xs ${
-                    profile.verification.address 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {profile.verification.address ? 'Verified' : 'Verify'}
-                </button>
+                <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                  Coming Soon
+                </span>
               </li>
               <li className="flex items-center justify-between">
                 <span>PAN/SSN</span>
-                <button
-                  onClick={() => handleVerificationUpdate('panSsn', !profile.verification.panSsn)}
-                  className={`px-2 py-1 rounded text-xs ${
-                    profile.verification.panSsn 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {profile.verification.panSsn ? 'Verified' : 'Verify'}
-                </button>
+                <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                  Coming Soon
+                </span>
               </li>
             </ul>
           </div>
@@ -522,8 +494,12 @@ export default function Profile() {
                 <input name="name" value={profile.name} onChange={handleChange} placeholder="Name" className="w-full p-2 border rounded" />
                 <input name="address" value={profile.address} onChange={handleChange} placeholder="Address" className="w-full p-2 border rounded" />
                 <input name="phone" value={profile.phone} onChange={handleChange} placeholder="Phone" className="w-full p-2 border rounded" />
-                <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
-                <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <input name="skills" value={profile.skills} onChange={handleChange} placeholder="Skills" className="w-full p-2 border rounded" />
+                    <input name="projects" type="number" value={profile.projects} onChange={handleChange} placeholder="Projects" className="w-full p-2 border rounded" />
+                  </>
+                )}
                 <button onClick={handleSave} disabled={saving} className="bg-orange-500 text-white px-4 py-2 rounded">{saving ? "Saving..." : "Save"}</button>
                 <button onClick={() => setEdit(false)} className="ml-2 px-4 py-2 border rounded">Cancel</button>
               </div>
@@ -532,42 +508,56 @@ export default function Profile() {
                 <div><b>Name:</b> {profile.name}</div>
                 <div><b>Address:</b> {profile.address}</div>
                 <div><b>Phone:</b> {profile.phone}</div>
-                <div><b>Skills:</b> {profile.skills}</div>
-                <div><b>Projects:</b> {profile.projects}</div>
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <div><b>Skills:</b> {profile.skills}</div>
+                    <div><b>Projects:</b> {profile.projects}</div>
+                  </>
+                )}
                 <button onClick={() => setEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit</button>
               </div>
             )}
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow space-y-4">
-            <h2 className="text-xl font-bold">About Me</h2>
+            <h2 className="text-xl font-bold">{profile.userType === 'client' ? 'Bio' : 'About Me'}</h2>
             {aboutEdit ? (
               <div className="space-y-3">
-                <textarea name="about" value={aboutForm.about} onChange={handleAboutChange} placeholder="About Me" className="w-full p-2 border rounded" />
-                <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
-                <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
-                <div className="relative">
-                  <input 
-                    type="file" 
-                    accept="video/*" 
-                    onChange={handleReelUpload} 
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                    id="reel-upload"
-                  />
-                  <label 
-                    htmlFor="reel-upload" 
-                    className="block w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-purple-400 transition-colors"
-                  >
-                    <span className="text-gray-500">📁 Choose file</span>
-                  </label>
-                </div>
-                {aboutForm.featuredReel && (
-                  <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
+                <textarea 
+                  name="about" 
+                  value={aboutForm.about} 
+                  onChange={handleAboutChange} 
+                  placeholder={profile.userType === 'client' ? 'Bio (text/links only)' : 'About Me'} 
+                  className="w-full p-2 border rounded" 
+                />
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <input name="specialization" value={aboutForm.specialization} onChange={handleAboutChange} placeholder="Specialization" className="w-full p-2 border rounded" />
+                    <label className="block text-sm font-medium mb-1">Upload Featured Reel (video):</label>
+                    <div className="relative">
+                      <input 
+                        type="file" 
+                        accept="video/*" 
+                        onChange={handleReelUpload} 
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                        id="reel-upload"
+                      />
+                      <label 
+                        htmlFor="reel-upload" 
+                        className="block w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-purple-400 transition-colors"
+                      >
+                        <span className="text-gray-500">📁 Choose file</span>
+                      </label>
+                    </div>
+                    {aboutForm.featuredReel && (
+                      <video src={aboutForm.featuredReel} controls className="w-full h-48 rounded-lg" />
+                    )}
+                  </>
                 )}
                 <button
                   onClick={handleAboutSave}
-                  disabled={aboutSaving || (aboutForm.featuredReel === '' && aboutSaving)}
-                  className={`bg-orange-500 text-white px-4 py-2 rounded ${aboutSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={aboutSaving}
+                  className="bg-orange-500 text-white px-4 py-2 rounded"
                 >
                   {aboutSaving ? "Saving..." : "Save"}
                 </button>
@@ -576,26 +566,33 @@ export default function Profile() {
             ) : (
               <div>
                 <p className="text-gray-700 text-sm">{profile.about}</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                  <h3 className="text-sm text-gray-600">🔹 Specialization <span className="text-purple-600 ml-2">{profile.specialization}</span></h3>
-                </div>
-                <div className="mt-4">
-                  <h3 className="font-semibold mb-2">Featured Reel</h3>
-                  {profile.featuredReel ? (
-                    <video src={profile.featuredReel} controls className="w-full h-48 rounded-lg" />
-                  ) : (
-                    <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center text-gray-500">
-                      🎞️ Featured Video
+                {profile.userType === 'freelancer' && (
+                  <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                      <h3 className="text-sm text-gray-600">🔹 Specialization <span className="text-purple-600 ml-2">{profile.specialization}</span></h3>
                     </div>
-                  )}
-                </div>
-                <button onClick={() => setAboutEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit About Me</button>
+                    <div className="mt-4">
+                      <h3 className="font-semibold mb-2">Featured Reel</h3>
+                      {profile.featuredReel ? (
+                        <video src={profile.featuredReel} controls className="w-full h-48 rounded-lg" />
+                      ) : (
+                        <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center text-gray-500">
+                          🎞️ Featured Video
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+                <button onClick={() => setAboutEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">
+                  Edit {profile.userType === 'client' ? 'Bio' : 'About Me'}
+                </button>
               </div>
             )}
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="font-bold mb-4 text-lg">My Services</h3>
+          {profile.userType === 'freelancer' && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="font-bold mb-4 text-lg">My Services</h3>
             {edit ? (
               <div className="space-y-3">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -632,13 +629,15 @@ export default function Profile() {
                       {typeof service === 'string' ? "Detailed service description goes here." : service.description || "Detailed service description goes here."}
                     </p>
                   </div>
-                ))}
+                )                )}
               </div>
             )}
-          </div>
+            </div>
+          )}
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="font-bold mb-4 text-lg">Portfolio</h3>
+          {profile.userType === 'freelancer' && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="font-bold mb-4 text-lg">Portfolio</h3>
             {portfolioEdit ? (
               <div>
                 {portfolioForm.map((item, idx) => (
@@ -664,10 +663,12 @@ export default function Profile() {
                 <button onClick={() => setPortfolioEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Portfolio</button>
               </div>
             )}
-          </div>
+            </div>
+          )}
 
-          <div className="bg-white p-10 rounded-lg shadow">
-            <h3 className="font-bold mb-4 text-lg">What Clients Say</h3>
+          {profile.userType === 'freelancer' && (
+            <div className="bg-white p-10 rounded-lg shadow">
+              <h3 className="font-bold mb-4 text-lg">What Clients Say</h3>
             {testimonialEdit ? (
               <div>
                 {testimonialForm.map((item, idx) => (
@@ -696,7 +697,8 @@ export default function Profile() {
                 <button onClick={() => setTestimonialEdit(true)} className="bg-purple-500 text-white px-4 py-2 rounded mt-2">Edit Testimonials</button>
               </div>
             )}
-          </div>
+            </div>
+          )}
         </div>
 
         <button
