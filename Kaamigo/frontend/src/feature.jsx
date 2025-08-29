@@ -103,7 +103,24 @@ export default function Features() {
                 <div className="text-4xl mb-3">{item.icon}</div>
                 <h4 className="text-xl font-semibold text-orange-600 mb-2">{item.title}</h4>
                 <p className="text-gray-600 text-sm mb-3">{item.desc}</p>
-                <a href="#" className="text-purple-600 text-sm underline">Learn More</a>
+                <button 
+                  onClick={() => {
+                    if (item.title === "Dynamic Video Reels") {
+                      navigate("/explore/reels");
+                    } else if (item.title === "Intuitive Voice Search") {
+                      navigate("/explore/jobs");
+                    } else if (item.title === "Real-time Map Discovery") {
+                      navigate("/explore");
+                    } else if (item.title === "Certified Trust Badges") {
+                      navigate("/explore/profile");
+                    } else {
+                      navigate("/coming-soon");
+                    }
+                  }}
+                  className="text-purple-600 text-sm underline hover:text-purple-800"
+                >
+                  Learn More
+                </button>
               </div>
             ))}
           </div>
