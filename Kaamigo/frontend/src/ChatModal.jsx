@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaPaperPlane, FaUser, FaHire, FaFlag } from "react-icons/fa";
+import { FaTimes, FaPaperPlane, FaUser, FaHandshake, FaFlag } from "react-icons/fa";
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "./firebase";
 
@@ -149,7 +149,7 @@ export default function Chat({ open, onClose, otherUser, userType }) {
             {userType === 'client' && (
               <button type="button" onClick={handleHire}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
-                <FaHire /> Hire
+                <FaHandshake /> Hire
               </button>
             )}
           </form>
